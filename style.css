@@ -1995,8 +1995,18 @@ footer p:last-child {
     background: #09080f;
 }
 
-#gxMessagesView,
-#gxMessagesView * {
+
+#gxMessagesView {
+    position: relative;
+    isolation: isolate;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+#gxMessagesView *,
+#gxMessagesView *::before,
+#gxMessagesView *::after {
     box-sizing: border-box;
 }
 
@@ -2486,5 +2496,397 @@ footer p:last-child {
     #gxMessagesView *::after {
         transition: none !important;
         scroll-behavior: auto !important;
+    }
+}
+
+/* FIX: GRADE X SCREEN VISIBILITY */
+[hidden] {
+    display: none !important;
+}
+
+/* Keep authentication screens visible when active */
+#authSection:not([hidden]) {
+    display: block;
+}
+
+#appSection:not([hidden]) {
+    display: block;
+}
+/* ============================================
+   GRADE X — INSTAGRAM-STYLE DIRECT MESSAGES
+============================================ */
+
+#gxMessagesView {
+    display: flex;
+    flex-direction: column;
+    background: #0f1015;
+    color: #f3f4f6;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    height: 80vh;
+    min-height: 580px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+/* Instagram Split View Layout */
+.gx-dm-layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Left Sidebar (Chats List + Header) */
+.gx-dm-sidebar {
+    background: #12141c;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+}
+
+.gx-dm-search-box {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gx-dm-search-box input {
+    width: 100%;
+    padding: 10px 14px;
+    background: #1a1d28;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.gx-dm-search-box input:focus {
+    border-color: #a78bfa;
+    background: #161922;
+}
+
+/* Instagram-style Tabs (Chats / Requests) */
+.gx-dm-tabs {
+    display: flex;
+    padding: 6px 16px;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gx-dm-tabs button {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #8a8f98;
+    padding: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.gx-dm-tabs button.active {
+    background: rgba(167, 139, 250, 0.1);
+    color: #a78bfa;
+}
+
+/* Search Results / Conversations Lists */
+#gxDMConversationList,
+#gxDMStudentResults {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+/* Conversation Row (Instagram Direct Row) */
+.gx-dm-conversation,
+.gx-dm-student-result {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    color: #f3f4f6;
+    transition: background 0.15s;
+    margin-bottom: 2px;
+}
+
+.gx-dm-conversation:hover,
+.gx-dm-student-result:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.gx-dm-conversation.active {
+    background: rgba(167, 139, 250, 0.12);
+}
+
+/* Insta-style Circle Avatar with Story Ring Vibe */
+.gx-dm-avatar {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    padding: 2px; /* Creates the Instagram story ring effect */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.gx-dm-avatar img,
+.gx-dm-avatar div {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #1e202c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.gx-dm-student-details {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    gap: 2px;
+}
+
+.gx-dm-student-details strong {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.gx-dm-student-details small {
+    font-size: 12px;
+    color: #8a8f98;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Right Pane: Active Chat Window */
+.gx-dm-chat-pane {
+    display: flex;
+    flex-direction: column;
+    background: #0f1015;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+}
+
+#gxDMChatHeader {
+    padding: 12px 20px;
+    background: #12141c;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 2;
+}
+
+.gx-dm-header-person {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.gx-dm-header-person .gx-dm-avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+}
+
+.gx-dm-header-person strong {
+    font-size: 14px;
+    color: #fff;
+}
+
+.gx-dm-header-person p {
+    font-size: 11px;
+    color: #8a8f98;
+    margin: 0;
+}
+
+/* Chat Messages Scroll Area */
+#gxDMMessages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #0f1015;
+}
+
+/* Instagram Chat Bubbles */
+.gx-dm-bubble {
+    max-width: 65%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    word-break: break-word;
+    font-size: 14px;
+}
+
+.gx-dm-bubble-incoming {
+    background: #1a1d28;
+    color: #f3f4f6;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
+
+.gx-dm-bubble-outgoing {
+    background: #7c3aed; /* Grade X Violet */
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+
+.gx-dm-bubble p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.gx-dm-bubble small {
+    font-size: 9px;
+    opacity: 0.6;
+    align-self: flex-end;
+}
+
+/* Instagram-style Message Input Bar */
+#gxDMComposeForm {
+    padding: 12px 16px;
+    background: #12141c;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#gxDMMessageInput {
+    flex: 1;
+    background: #1a1d28;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 22px;
+    padding: 10px 16px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#gxDMMessageInput:focus {
+    border-color: #7c3aed;
+}
+
+#gxDMSendButton {
+    background: transparent;
+    color: #a78bfa;
+    border: none;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+#gxDMSendButton:hover {
+    opacity: 0.8;
+}
+
+#gxDMSendButton:disabled {
+    color: #555;
+    cursor: not-allowed;
+}
+
+/* Request Alerts & Action buttons */
+.gx-dm-status {
+    text-align: center;
+    color: #8a8f98;
+    font-size: 13px;
+    padding: 24px;
+}
+
+.gx-dm-request-note {
+    font-size: 12px;
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.08);
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin: 0;
+}
+
+.gx-dm-request-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.gx-dm-accept {
+    background: #7c3aed;
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.gx-dm-decline {
+    background: #232633;
+    color: #f3f4f6;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* Mobile responsive view (Instagram Mobile DM Drawer Behavior) */
+@media (max-width: 768px) {
+    .gx-dm-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .gx-dm-chat-pane {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+    }
+    
+    /* When a chat is open on mobile, slide/switch to chat view */
+    .gx-dm-chat-open .gx-dm-sidebar {
+        display: none;
+    }
+    
+    .gx-dm-chat-open .gx-dm-chat-pane {
+        display: flex;
     }
 }
