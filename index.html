@@ -624,11 +624,22 @@ body.gx-modal-open {
 
 <!-- MESSAGES -->
 
+
+<!-- MESSAGES -->
+
 <section id="gxMessagesView" class="social-view" hidden>
   <div class="gx-dm-layout">
     <aside class="gx-dm-inbox">
       <div class="gx-dm-inbox-header">
+        <button
+          type="button"
+          id="gxDMBackButton"
+          aria-label="Back to Home"
+          title="Back to Home"
+        >←</button>
+
         <h2>Messages</h2>
+
         <button type="button" id="gxDMNewChat">＋</button>
       </div>
 
@@ -642,6 +653,7 @@ body.gx-modal-open {
       </div>
 
       <div id="gxDMStudentResults" hidden></div>
+
       <div id="gxDMConversationList">
         <div class="gx-dm-loading">Your conversations will appear here.</div>
       </div>
@@ -660,9 +672,6 @@ body.gx-modal-open {
 
       <div id="gxDMMessages" class="gx-dm-message-list">
         <div class="gx-dm-welcome">
-          <span>✉️</span>
-          <h3>Your private conversations</h3>
-          <p>Connect with friends and students who follow you back.</p>
         </div>
       </div>
 
@@ -679,7 +688,6 @@ body.gx-modal-open {
     </section>
   </div>
 </section>
-
 
 <!-- SOCIAL PROFILE -->
 <!-- SOCIAL PROFILE -->
@@ -1185,10 +1193,22 @@ if (socialBio && bioInput) {
     window.scrollTo(0, 0);
   }
 
-  function showView(view) {
+  
+var gxCurrentView = "home";
+var gxPreviousView = "home";
+
+function showView(view) {
+    if (!socialIds[view] && !legacyIds[view]) return;
+
+    if (view !== gxCurrentView) {
+        gxPreviousView = gxCurrentView;
+        gxCurrentView = view;
+    }
+
     if (socialIds[view]) openSocial(view);
     else if (legacyIds[view]) openLegacy(view);
-  }
+}
+
 
   document.querySelectorAll("[data-social-view]").forEach(function (button) {
     button.addEventListener("click", function () {
@@ -1291,6 +1311,7 @@ if (dmButton) {
     });
   }
 })();
+
 </script>
 
 <script>
@@ -1463,7 +1484,21 @@ if (dmButton) {
 
   window.gxCloseCreatePost = closeCreatePost;
 })();
-
+  function hideAllViews() {
+    Object.keys(socialIds).forEach(function(key) {
+      var element = document.getElementById(socialIds[key]);
+      if (element) element.hidden = true;
+    });
+    
+    Object.keys(legacyIds).forEach(function(key) {
+      var element = document.getElementById(legacyIds[key]);
+      if (element) element.hidden = true;
+    });
+  }
+  
+  // Paste the back-button script here
+  
+  </script>
 </script>
 
 </body>
