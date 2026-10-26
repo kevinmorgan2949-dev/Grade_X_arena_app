@@ -932,6 +932,18 @@ body.gx-modal-open {
     </div>
     <h2 id="publicStudentName">GRADE X Student</h2>
     <p id="publicStudentJoined">GRADE X student</p>
+
+    <!-- Instagram-style stats for public profile -->
+    <div class="profile-stats" style="justify-content: center; margin: 16px 0;">
+      <div><strong id="publicStudentFollowerCount">0</strong><span>Followers</span></div>
+      <div><strong id="publicStudentFollowingCount">0</strong><span>Following</span></div>
+    </div>
+
+<div id="publicStudentFollowContainer" style="margin-bottom: 16px;">
+  <button type="button" id="publicStudentFollowBtn" class="primary-btn">Follow</button>
+</div>
+
+
     <h3>📚 Published Study Materials</h3>
     <div id="publicStudentPDFs"><p>Loading study materials...</p></div>
     <p id="publicStudentProfileStatus" role="status" aria-live="polite"></p>
@@ -941,11 +953,6 @@ body.gx-modal-open {
 <button id="signOutBtn" type="button" class="signout-btn">Sign Out</button>
 </section>
 </main>
-
-<footer>
-  <p>GRADE X ARENA</p>
-  <p>Learn smarter. Rise higher. 🚀</p>
-</footer>
 
 
 <!-- INSTAGRAM-STYLE GRADE X NAVIGATION -->
@@ -1057,12 +1064,13 @@ body.gx-modal-open {
 (function () {
   "use strict";
 
-  var socialIds = {
+    var socialIds = {
     home: "gxHomeView",
     search: "gxSearchView",
     create: "gxCreateView",
     messages: "gxMessagesView",
-    profile: "gxProfileView"
+    profile: "gxProfileView",
+    publicProfile: "publicStudentProfilePage" // 👈 Move it here so it's handled like a social view!
   };
 
   var legacyIds = {
@@ -1072,9 +1080,9 @@ body.gx-modal-open {
     store: "storePage",
     coins: "walletPage",
     roadmap: "comingSoonPage",
-    profileSettings: "profilePage",
-    publicProfile: "publicStudentProfilePage"
+    profileSettings: "profilePage"
   };
+
 
   var legacyButtons = {
     library: "library",
@@ -1420,9 +1428,8 @@ if (dmBackButton) {
     // Keep the app open and ready for another Back action
     history.pushState({ gxPage: true }, "", location.href);
   });
-
 /* GRADE X — CREATE POST MODAL AND MEDIA PREVIEW */
-(function () {
+(function() {
   const modal = document.getElementById("gxCreatePostModal");
   const form = document.getElementById("gxSocialPostForm");
   const mediaInput = document.getElementById("gxPostMedia");
@@ -1430,61 +1437,61 @@ if (dmBackButton) {
   const image = document.getElementById("gxPostImagePreview");
   const video = document.getElementById("gxPostVideoPreview");
   const status = document.getElementById("gxPostStatus");
-
+  
   if (!modal || !form || !mediaInput) return;
-
+  
   function openCreatePost() {
     modal.hidden = false;
     document.body.classList.add("gx-modal-open");
   }
-
+  
   function closeCreatePost() {
     modal.hidden = true;
     document.body.classList.remove("gx-modal-open");
   }
-
+  
   document.querySelectorAll('[data-open-view="create"]').forEach(button => {
-    button.addEventListener("click", function (event) {
+    button.addEventListener("click", function(event) {
       event.preventDefault();
       openCreatePost();
     });
   });
-
+  
   document.querySelectorAll("[data-close-create-post]").forEach(button => {
     button.addEventListener("click", closeCreatePost);
   });
-
-  document.addEventListener("keydown", function (event) {
+  
+  document.addEventListener("keydown", function(event) {
     if (event.key === "Escape" && !modal.hidden) {
       closeCreatePost();
     }
   });
-
-  mediaInput.addEventListener("change", function () {
+  
+  mediaInput.addEventListener("change", function() {
     const file = mediaInput.files && mediaInput.files[0];
-
+    
     image.hidden = true;
     video.hidden = true;
     preview.hidden = true;
-
+    
     image.removeAttribute("src");
     video.pause();
     video.removeAttribute("src");
     video.load();
-
+    
     if (!file) return;
-
+    
     const isImage = file.type.startsWith("image/");
     const isVideo = file.type.startsWith("video/");
-
+    
     if (!isImage && !isVideo) {
       mediaInput.value = "";
       if (status) status.textContent = "Choose a valid photo or video.";
       return;
     }
-
+    
     const url = URL.createObjectURL(file);
-
+    
     if (isImage) {
       image.src = url;
       image.hidden = false;
@@ -1492,30 +1499,12 @@ if (dmBackButton) {
       video.src = url;
       video.hidden = false;
     }
-
+    
     preview.hidden = false;
-
+    
     if (status) status.textContent = "";
   });
-
+  
   window.gxCloseCreatePost = closeCreatePost;
 })();
-  function hideAllViews() {
-    Object.keys(socialIds).forEach(function(key) {
-      var element = document.getElementById(socialIds[key]);
-      if (element) element.hidden = true;
-    });
-    
-    Object.keys(legacyIds).forEach(function(key) {
-      var element = document.getElementById(legacyIds[key]);
-      if (element) element.hidden = true;
-    });
-  }
-  
-  // Paste the back-button script here
-  
-  </script>
 </script>
-
-</body>
-</html

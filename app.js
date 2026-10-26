@@ -716,11 +716,14 @@ async function openPublicStudentProfile(studentId) {
             if (avatarFallback) avatarFallback.hidden = true;
         }
 
-        if (student.created_at && joinedElement) {
+                if (student.created_at && joinedElement) {
             joinedElement.textContent =
                 "Joined " +
                 new Date(student.created_at).toLocaleDateString();
         }
+        await loadProfileFollowStats(studentId, "publicStudentFollowerCount", "publicStudentFollowingCount");
+        await setupPublicStudentFollow(studentId);
+
 
         const { data: studentPDFs, error: pdfError } = await db
             .from("published_pdfs_with_authors")
@@ -1336,6 +1339,30 @@ function renderProfile() {
     const metadata = currentUser.user_metadata || {};
     const displayName = metadata.display_name || "GRADE X Student";
     const avatarUrl = metadata.avatar_url || "";
+        if (avatarUrl && profileAvatarImage) {
+        profileAvatarImage.src = avatarUrl;
+        profileAvatarImage.hidden = false;
+
+        if (profileAvatarFallback) {
+            profileAvatarFallback.hidden = true;
+        }
+    } else {
+        if (profileAvatarImage) {
+            profileAvatarImage.removeAttribute("src");
+            profileAvatarImage.hidden = true;
+        }
+
+        if (profileAvatarFallback) {
+            profileAvatarFallback.hidden = false;
+        }
+    }
+
+    if (profileStatus) profileStatus.textContent = "";
+
+    // ADD THIS RIGHT HERE:
+    if (currentUser && currentUser.id) {
+        loadProfileFollowStats(currentUser.id, "gxProfileFollowerCount", "gxProfileFollowingCount");
+    }
 
     if (profileNameDisplay) {
         profileNameDisplay.textContent = displayName;
@@ -1486,11 +1513,11 @@ if (saveProfileBtn) {
             return;
         }
 
-        const displayName = profileNameInput
+                const displayName = profileNameInput
             ? profileNameInput.value.trim()
             : "";
 
-        const usernameInput = profileUsernameInput
+        let usernameInput = profileUsernameInput
             ? profileUsernameInput.value.trim().toLowerCase()
             : "";
         const bioInput = profileBioInput ?
@@ -1505,6 +1532,16 @@ if (saveProfileBtn) {
             );
             return;
         }
+
+        // AUTO-GENERATE USERNAME IF BLANK
+        if (!usernameInput) {
+            const emailPrefix = currentUser.email 
+                ? currentUser.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '') 
+                : 'student';
+            const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+            usernameInput = `${emailPrefix}_${randomSuffix}`.slice(0, 20);
+        }
+
 
         if (
             usernameInput &&
@@ -3026,3 +3063,218 @@ async function loadGXProfilePosts() {
 
   console.log("GRADE X DM interface connected.");
 })();
+/* ==========================================
+   GRADE X — INSTAGRAM FOLLOW & STATS SYSTEM
+========================================== */
+
+async function loadProfileFollowStats(profileUserId, followerElId, followingElId) {
+    const followerEl = document.getElementById(followerElId);
+    const followingEl = document.getElementById(followingElId);
+
+    if (!profileUserId) return;
+
+    // Fetch Followers count
+    const { count: followers } = await db
+        .from("gx_follows")
+        .select("*", { count: "exact", head: true })
+        .eq("following_id", profileUserId);
+
+    // Fetch Following count
+    const { count: following } = await db
+        .from("gx_follows")
+        .select("*", { count: "exact", head: true })
+        .eq("follower_id", profileUserId);
+
+    if (followerEl) followerEl.textContent = followers || 0;
+    if (followingEl) followingEl.textContent = following || 0;
+}
+
+async function setupPublicStudentFollow(profileUserId) {
+    const container = document.getElementById("publicStudentFollowContainer");
+    const btn = document.getElementById("publicStudentFollowBtn");
+
+    if (!container || !btn || !currentUser) {
+        if (container) container.hidden = true;
+        return;
+    }
+
+    // Hide follow button if viewing your own profile
+    if (currentUser.id === profileUserId) {
+        container.hidden = true;
+        return;
+    }
+
+    container.hidden = false;
+
+    // Check if current user already follows this student
+    const { data: existing } = await db
+        .from("gx_follows")
+        .select("*")
+        .eq("follower_id", currentUser.id)
+        .eq("following_id", profileUserId)
+        .maybeSingle();
+
+    let isFollowing = !!existing;
+    updateFollowBtnUI(btn, isFollowing);
+
+    // Clean clone to prevent duplicate event listeners
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+
+    newBtn.addEventListener("click", async function () {
+        newBtn.disabled = true;
+
+        if (isFollowing) {
+            // Unfollow action
+            const { error } = await db
+                .from("gx_follows")
+                .delete()
+                .eq("follower_id", currentUser.id)
+                .eq("following_id", profileUserId);
+
+            if (!error) {
+                isFollowing = false;
+                updateFollowBtnUI(newBtn, false);
+                loadProfileFollowStats(profileUserId, "publicStudentFollowerCount", "publicStudentFollowingCount");
+            }
+        } else {
+            // Follow action
+            const { error } = await db
+                .from("gx_follows")
+                .insert({
+                    follower_id: currentUser.id,
+                    following_id: profileUserId
+                });
+
+            if (!error) {
+                isFollowing = true;
+                updateFollowBtnUI(newBtn, true);
+                loadProfileFollowStats(profileUserId, "publicStudentFollowerCount", "publicStudentFollowingCount");
+            }
+        }
+        newBtn.disabled = false;
+    });
+}
+
+function updateFollowBtnUI(btn, isFollowing) {
+    if (isFollowing) {
+        btn.textContent = "Following";
+        btn.classList.add("is-following");
+    } else {
+        btn.textContent = "Follow";
+        btn.classList.remove("is-following");
+    }
+}
+/* ==========================================
+   GRADE X — INSTAGRAM FOLLOW & STATS SYSTEM
+========================================== */
+
+async function loadProfileFollowStats(profileUserId, followerElId, followingElId) {
+    const followerEl = document.getElementById(followerElId);
+    const followingEl = document.getElementById(followingElId);
+
+    if (!profileUserId) return;
+
+    const { count: followers, error: followerError } = await db
+        .from("gx_follows")
+        .select("*", { count: "exact", head: true })
+        .eq("following_id", profileUserId);
+
+    const { count: following, error: followingError } = await db
+        .from("gx_follows")
+        .select("*", { count: "exact", head: true })
+        .eq("follower_id", profileUserId);
+
+    if (followerError) console.error("Error loading followers:", followerError);
+    if (followingError) console.error("Error loading following:", followingError);
+
+    if (followerEl) followerEl.textContent = followers || 0;
+    if (followingEl) followingEl.textContent = following || 0;
+}
+
+async function setupPublicStudentFollow(profileUserId) {
+    const btn = document.getElementById("publicStudentFollowBtn");
+    if (!btn) return;
+
+    // Force button to stay visible
+    btn.style.display = "block";
+    btn.disabled = false;
+
+    // Hide if viewing your own profile
+    if (currentUser && currentUser.id === profileUserId) {
+        btn.style.display = "none";
+        return;
+    }
+
+    let isFollowing = false;
+
+    if (currentUser && currentUser.id) {
+        const { data: existing } = await db
+            .from("gx_follows")
+            .select("*")
+            .eq("follower_id", currentUser.id)
+            .eq("following_id", profileUserId)
+            .maybeSingle();
+
+        isFollowing = !!existing;
+    }
+
+    updateFollowBtnUI(btn, isFollowing);
+
+    // Clean clone to prevent duplicate event listeners
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+
+    newBtn.addEventListener("click", async function () {
+        if (!currentUser || !currentUser.id) {
+            alert("Please sign in to follow students.");
+            return;
+        }
+
+        newBtn.disabled = true;
+
+        if (isFollowing) {
+            const { error } = await db
+                .from("gx_follows")
+                .delete()
+                .eq("follower_id", currentUser.id)
+                .eq("following_id", profileUserId);
+
+            if (!error) {
+                isFollowing = false;
+                updateFollowBtnUI(newBtn, false);
+                await loadProfileFollowStats(profileUserId, "publicStudentFollowerCount", "publicStudentFollowingCount");
+            } else {
+                alert("Unfollow failed: " + error.message);
+            }
+        } else {
+            const { error } = await db
+                .from("gx_follows")
+                .insert({
+                    follower_id: currentUser.id,
+                    following_id: profileUserId
+                });
+
+            if (!error) {
+                isFollowing = true;
+                updateFollowBtnUI(newBtn, true);
+                await loadProfileFollowStats(profileUserId, "publicStudentFollowerCount", "publicStudentFollowingCount");
+            } else {
+                alert("Follow failed: " + error.message);
+            }
+        }
+        newBtn.disabled = false;
+    });
+}
+
+function updateFollowBtnUI(btn, isFollowing) {
+    if (isFollowing) {
+        btn.textContent = "Following";
+        btn.classList.add("is-following");
+        btn.style.background = "#333";
+    } else {
+        btn.textContent = "Follow";
+        btn.classList.remove("is-following");
+        btn.style.background = "";
+    }
+}
