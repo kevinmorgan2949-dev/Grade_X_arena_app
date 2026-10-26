@@ -1230,6 +1230,22 @@ if (dmButton) {
   });
 }
 
+var dmBackButton = document.getElementById("gxDMBackButton");
+
+if (dmBackButton) {
+  dmBackButton.addEventListener("click", function (event) {
+    event.preventDefault();
+
+    var destination = gxPreviousView || "home";
+
+    if (destination === "messages") {
+      destination = "home";
+    }
+
+    showView(destination);
+  });
+}
+
   var settingsButton = document.getElementById("gxSettingsButton");
   if (settingsButton) {
     settingsButton.addEventListener("click", function () {
