@@ -1049,6 +1049,11 @@ if (chatForm && chatInput && chatMessages) {
 
                 pdfContext = await extractPdfText(selectedPdf);
 
+                // SPEED BOOST: Trim context to roughly 8,000 characters max
+                if (pdfContext.length > 8000) {
+                    pdfContext = pdfContext.slice(0, 8000) + "\n[Content truncated for speed]";
+                }
+
                 showMessage(
                     botPDFStatus,
                     "Studying: " + selectedPdf.title
@@ -1110,7 +1115,6 @@ if (chatForm && chatInput && chatMessages) {
         }
     });
 }
-
 
 // ============================================
 // 14. ARENA — FREE PRACTICE QUIZ
