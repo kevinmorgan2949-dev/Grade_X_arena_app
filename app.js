@@ -1065,24 +1065,25 @@ if (chatForm && chatInput && chatMessages) {
                 }
             }
 
-            const { data, error } = await db.functions.invoke(
-                "dynamic-function",
-                {
-                    body: {
-                        question: question,
-                        pdfContext: pdfContext,
-                        pdfTitle: selectedPdf ? selectedPdf.title : ""
-                    }
-                }
-            );
+                        const response = await fetch("https://vkojdzbhautxwcujmjiu.supabase.co/functions/v1/dynamic-function", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+                },
+                body: JSON.stringify({
+                    question: question,
+                    pdfContext: pdfContext,
+                    pdfTitle: selectedPdf ? selectedPdf.title : ""
+                })
+            });
 
-            if (error) {
-                console.error("GRADE BOT connection error:", error);
+            const data = await response.json();
 
-                throw new Error(
-                    "Couldn't connect to GRADE BOT. Please try again."
-                );
+            if (!response.ok) {
+                throw new Error(data?.error || "Couldn't connect to GRADE BOT. Please try again.");
             }
+
 
             if (!data || !data.answer) {
                 throw new Error(
