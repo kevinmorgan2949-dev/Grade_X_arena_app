@@ -1,5 +1,4 @@
-
-name: Build GRADE X Arena Android APK
+Name: Build GRADE X Arena Android APK
 
 on:
   workflow_dispatch:
@@ -22,15 +21,12 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "21"
+          java-version: "17"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+          node-version: "20"
 
       - name: Install dependencies
         run: npm install
@@ -39,7 +35,7 @@ jobs:
         run: npm run build
 
       - name: Create Android project
-        run: npx cap add android
+        run: npx cap add android || true
 
       - name: Sync website to Android
         run: npx cap sync android
