@@ -1,0 +1,10 @@
+
+{
+  "appId": "com.gradex.arena",
+  "appName": "GRADE X Arena",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}
