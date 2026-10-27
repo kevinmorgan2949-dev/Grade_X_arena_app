@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Get source code
         uses: actions/checkout@v4
+        with:
+          path: .
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -30,7 +32,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
-        working-directory: .
 
       - name: Prepare website files
         run: npm run build
