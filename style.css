@@ -2003,8 +2003,8 @@ footer p:last-child {
 }
 
 .gx-dm-layout {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 340px 1fr;
     height: 100%;
     width: 100%;
     overflow: hidden;
@@ -2013,7 +2013,6 @@ footer p:last-child {
     min-height: 0;
 }
 
-
 .gx-dm-sidebar {
     background: #12141c;
     border-right: 1px solid rgba(255, 255, 255, 0.06);
@@ -2021,8 +2020,7 @@ footer p:last-child {
     flex-direction: column;
     overflow-y: auto;
     height: 100%;
-    width: 340px;
-    min-width: 340px;
+    min-width: 0;
 }
 
 .gx-dm-chat-pane {
