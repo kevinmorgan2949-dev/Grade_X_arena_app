@@ -1,4 +1,4 @@
-Name: Build GRADE X Arena Android APK
+name: Build GRADE X Arena Android APK
 
 on:
   workflow_dispatch:
