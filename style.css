@@ -2000,6 +2000,23 @@ footer p:last-child {
     margin: 0;
     box-shadow: none;
 }
+.gx-dm-avatar {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+}
+
+.gx-dm-avatar img,
+.gx-dm-avatar div {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+}
 
 .gx-dm-layout {
     display: flex;
