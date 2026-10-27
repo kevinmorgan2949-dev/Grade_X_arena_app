@@ -1,0 +1,10 @@
+
+{
+  "name": "grade-x-arena",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GRADE X Arena Android packaging",
+  "scripts": {
+    "build": "node scripts/prepare-web.js"
+  }
+}
