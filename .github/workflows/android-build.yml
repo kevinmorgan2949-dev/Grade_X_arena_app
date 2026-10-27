@@ -30,6 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
+        working-directory: .
 
       - name: Prepare website files
         run: npm run build
