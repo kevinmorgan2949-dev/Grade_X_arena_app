@@ -1,5 +1,5 @@
 
-name: Build GRADE X Arena Android APK
+name: Build GRADE X Arena Android Release
 
 on:
   workflow_dispatch:
@@ -48,15 +48,15 @@ jobs:
       - name: Sync web files
         run: npx cap sync android
 
-      - name: Build debug APK
+      - name: Build Android App Bundle
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew bundleRelease
 
-      - name: Upload APK
+      - name: Upload Android App Bundle
         uses: actions/upload-artifact@v4
         with:
-          name: grade-x-arena-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: grade-x-arena-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
