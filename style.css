@@ -2629,3 +2629,547 @@ footer p:last-child {
 .social-bottom-nav .social-nav-button.active svg {
   stroke: #bd9bff !important;
 }
+
+/* ==========================================
+   GRADE X — PREMIUM PRIVATE MESSAGING
+   Violet / Magenta WhatsApp-style UI
+========================================== */
+
+#gxMessagesView {
+  --dm-bg: #080310;
+  --dm-panel: rgba(255,255,255,.055);
+  --dm-panel-2: rgba(255,255,255,.09);
+  --dm-border: rgba(255,255,255,.12);
+  --dm-text: #f7f5ff;
+  --dm-muted: #b5a9d4;
+  --dm-purple: #7c3aed;
+  --dm-magenta: #a21caf;
+
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  color: var(--dm-text);
+  background:
+    radial-gradient(ellipse at 10% 0%, #7c3aed35, transparent 50%),
+    radial-gradient(ellipse at 95% 10%, #c026d330, transparent 48%),
+    linear-gradient(160deg, #10071c, var(--dm-bg) 65%);
+  overflow: hidden;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+#gxMessagesView *,
+#gxMessagesView *::before,
+#gxMessagesView *::after {
+  box-sizing: border-box;
+}
+
+#gxMessagesView .gx-dm-screen[hidden],
+#gxMessagesView[hidden] {
+  display: none !important;
+}
+
+/* MAIN SCREEN */
+
+#gxMessagesView .gx-dm-screen {
+  width: 100%;
+  min-height: 100%;
+  padding: 18px 15px 24px;
+  animation: gxDMFadeIn .25s ease;
+}
+
+#gxMessagesView .gx-dm-page-header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+#gxMessagesView .gx-dm-eyebrow {
+  display: block;
+  color: #c084fc;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 5px;
+}
+
+#gxMessagesView .gx-dm-page-header h2 {
+  margin: 0;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -.7px;
+}
+
+#gxMessagesView .gx-dm-page-header p {
+  color: var(--dm-muted);
+  font-size: 12px;
+  margin: 5px 0 0;
+}
+
+/* ICON BUTTONS */
+
+#gxMessagesView .gx-dm-icon-btn {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--dm-border);
+  border-radius: 50%;
+  background: var(--dm-panel);
+  color: white;
+  font-size: 22px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+#gxMessagesView .gx-dm-icon-btn:active {
+  transform: scale(.93);
+  background: #7c3aed55;
+}
+
+/* SEARCH */
+
+#gxMessagesView .gx-dm-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 49px;
+  padding: 0 15px;
+  border: 1px solid var(--dm-border);
+  border-radius: 17px;
+  background: var(--dm-panel);
+  margin-bottom: 18px;
+}
+
+#gxMessagesView .gx-dm-search-wrap span {
+  font-size: 24px;
+  color: #c084fc;
+}
+
+#gxMessagesView .gx-dm-search-wrap input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: white;
+  font-size: 14px;
+}
+
+#gxMessagesView .gx-dm-search-wrap input::placeholder {
+  color: #a99bbf;
+}
+
+/* CHATS / REQUESTS NAVIGATION */
+
+#gxMessagesView .gx-dm-navigation {
+  display: flex;
+  gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--dm-border);
+}
+
+#gxMessagesView .gx-dm-navigation button {
+  border: 1px solid transparent;
+  border-radius: 30px;
+  padding: 10px 19px;
+  background: var(--dm-panel);
+  color: var(--dm-muted);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+#gxMessagesView .gx-dm-navigation button.active {
+  color: white;
+  background: linear-gradient(120deg, #7c3aed, #a21caf);
+  box-shadow: 0 5px 20px #7c3aed45;
+}
+
+#gxMessagesView #gxDMRequestCount {
+  margin-left: 4px;
+}
+
+/* SECTION HEADING */
+
+#gxMessagesView .gx-dm-section-heading {
+  padding: 19px 3px 11px;
+  color: #a99ac9;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+/* CONVERSATION LIST */
+
+#gxMessagesView .gx-dm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#gxMessagesView .gx-dm-conversation,
+#gxMessagesView .gx-dm-student-result {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 17px;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease;
+}
+
+#gxMessagesView .gx-dm-conversation:active,
+#gxMessagesView .gx-dm-student-result:active {
+  background: var(--dm-panel-2);
+}
+
+#gxMessagesView .gx-dm-conversation:hover,
+#gxMessagesView .gx-dm-student-result:hover {
+  background: var(--dm-panel);
+  border-color: var(--dm-border);
+}
+
+#gxMessagesView .gx-dm-avatar {
+  position: relative;
+  flex: 0 0 49px;
+  width: 49px;
+  height: 49px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: linear-gradient(140deg, #7c3aed, #c026d3);
+  color: white;
+  font-size: 20px;
+  font-weight: 800;
+  box-shadow: inset 0 0 0 2px #ffffff30;
+}
+
+#gxMessagesView .gx-dm-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#gxMessagesView .gx-dm-student-details {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#gxMessagesView .gx-dm-student-details strong {
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#gxMessagesView .gx-dm-student-details small {
+  color: var(--dm-muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* SEARCH RESULTS */
+
+#gxMessagesView #gxDMStudentResults {
+  max-height: 280px;
+  overflow-y: auto;
+  margin: -7px 0 15px;
+  padding: 7px;
+  border: 1px solid var(--dm-border);
+  border-radius: 16px;
+  background: #170d25;
+}
+
+#gxMessagesView #gxDMStudentResults[hidden] {
+  display: none !important;
+}
+
+/* EMPTY / LOADING STATES */
+
+#gxMessagesView .gx-dm-status {
+  padding: 25px 12px;
+  color: var(--dm-muted);
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* INDIVIDUAL CHAT */
+
+#gxMessagesView #gxDMChatScreen {
+  padding: 0;
+  height: 100%;
+  min-height: 0;
+}
+
+#gxMessagesView .gx-dm-chat-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: min(78vh, 760px);
+  min-height: 420px;
+  overflow: hidden;
+  border: 1px solid var(--dm-border);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff0c, #ffffff04);
+  box-shadow: 0 20px 60px #00000055, 0 0 30px #7c3aed20;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* CHAT HEADER */
+
+#gxMessagesView .gx-dm-chat-header {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 11px;
+  padding: 12px;
+  border-bottom: 1px solid var(--dm-border);
+  background: linear-gradient(120deg, #7c3aed28, #a21caf12);
+}
+
+#gxMessagesView .gx-dm-header-person {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+#gxMessagesView .gx-dm-header-person strong {
+  display: block;
+  color: white;
+  font-size: 14px;
+}
+
+#gxMessagesView .gx-dm-header-person p {
+  margin: 4px 0 0;
+  color: var(--dm-muted);
+  font-size: 11px;
+}
+
+/* MESSAGE THREAD */
+
+#gxMessagesView .gx-dm-message-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 19px 13px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #7045a0 transparent;
+}
+
+#gxMessagesView .gx-dm-bubble {
+  max-width: 82%;
+  padding: 11px 14px;
+  border-radius: 17px;
+  box-shadow: 0 3px 12px #00000025;
+  overflow-wrap: anywhere;
+  animation: gxDMFadeIn .2s ease;
+}
+
+#gxMessagesView .gx-dm-bubble p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+#gxMessagesView .gx-dm-bubble small {
+  display: block;
+  margin-top: 6px;
+  font-size: 10px;
+  opacity: .7;
+  text-align: right;
+}
+
+#gxMessagesView .gx-dm-bubble-incoming {
+  align-self: flex-start;
+  color: white;
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.1);
+  border-bottom-left-radius: 5px;
+}
+
+#gxMessagesView .gx-dm-bubble-outgoing {
+  align-self: flex-end;
+  color: white;
+  background: linear-gradient(135deg, #7c3aed, #a21caf);
+  border-bottom-right-radius: 5px;
+}
+
+/* MESSAGE COMPOSER */
+
+#gxMessagesView .gx-dm-compose {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px;
+  padding-bottom: calc(11px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--dm-border);
+  background: linear-gradient(0deg, #7c3aed22, transparent);
+}
+
+#gxMessagesView .gx-dm-compose textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 43px;
+  max-height: 110px;
+  resize: none;
+  padding: 12px 15px;
+  border: 1px solid var(--dm-border);
+  border-radius: 25px;
+  outline: none;
+  background: var(--dm-panel);
+  color: white;
+  font: inherit;
+  font-size: 13px;
+}
+
+#gxMessagesView .gx-dm-compose textarea::placeholder {
+  color: #a99bbf;
+}
+
+#gxMessagesView .gx-dm-compose textarea:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 0 3px #a855f728;
+}
+
+#gxMessagesView .gx-dm-compose button {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #c026d3);
+  color: white;
+  font-size: 19px;
+  cursor: pointer;
+  box-shadow: 0 5px 18px #7c3aed55;
+}
+
+#gxMessagesView .gx-dm-compose button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* REQUEST ACTIONS */
+
+#gxMessagesView .gx-dm-request-note {
+  flex: 1 0 100%;
+  margin: 5px 0;
+  color: #e0d2ff;
+  font-size: 12px;
+}
+
+#gxMessagesView .gx-dm-request-actions {
+  display: flex;
+  gap: 9px;
+  width: 100%;
+}
+
+#gxMessagesView .gx-dm-request-actions button {
+  flex: 1;
+  min-height: 40px;
+  border: 0;
+  border-radius: 12px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#gxMessagesView .gx-dm-accept {
+  background: linear-gradient(120deg, #7c3aed, #a21caf);
+}
+
+#gxMessagesView .gx-dm-decline {
+  background: rgba(255,255,255,.1);
+  border: 1px solid var(--dm-border) !important;
+}
+
+/* ANIMATION */
+
+@keyframes gxDMFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* SMALL PHONES */
+
+@media (max-width: 400px) {
+  #gxMessagesView .gx-dm-screen {
+    padding: 14px 11px 20px;
+  }
+
+  #gxMessagesView .gx-dm-page-header h2 {
+    font-size: 24px;
+  }
+
+  #gxMessagesView .gx-dm-chat-shell {
+    height: 76vh;
+    min-height: 380px;
+    border-radius: 17px;
+  }
+
+  #gxMessagesView .gx-dm-bubble {
+    max-width: 88%;
+  }
+}
+
+/* DESKTOP */
+
+@media (min-width: 700px) {
+  #gxMessagesView .gx-dm-screen {
+    max-width: 650px;
+    margin: 0 auto;
+    padding: 25px;
+  }
+
+  #gxMessagesView #gxDMChatScreen {
+    max-width: 600px;
+  }
+
+  #gxMessagesView .gx-dm-chat-shell {
+    height: min(78vh, 760px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #gxMessagesView *,
+  #gxMessagesView *::before,
+  #gxMessagesView *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* END GRADE X PRIVATE MESSAGING CSS */
+/* ========================================

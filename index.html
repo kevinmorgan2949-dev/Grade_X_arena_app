@@ -622,105 +622,118 @@ body.gx-modal-open {
   <div class="feature-note">Searching student profiles and posts will be enabled when social search is connected to the backend.</div>
 </section>
 
-<!-- GRADE X — NEW PRIVATE MESSAGING UI -->
+
+<!-- GRADE X — WHATSAPP STYLE PRIVATE MESSAGING -->
+
 <section id="gxMessagesView" class="social-view gx-messages-screen" hidden>
 
-  <div class="gx-dm-layout gx-modern-layout">
+  <!-- SCREEN 1: CONVERSATION LIST -->
+  <div id="gxDMInboxScreen" class="gx-dm-screen">
 
-    <!-- INBOX / STUDENT SEARCH -->
-    <aside class="gx-dm-inbox gx-modern-inbox">
-
-      <div class="gx-dm-inbox-header gx-modern-inbox-header">
-        <div class="gx-dm-heading">
-          <span class="gx-dm-eyebrow">GRADE X ARENA</span>
-          <h2>Messages</h2>
-          <p>Your private conversations</p>
-        </div>
-
-        <button
-          type="button"
-          id="gxDMNewChat"
-          class="gx-dm-new-chat"
-          aria-label="Start a new conversation"
-          title="New message"
-        >＋</button>
+    <header class="gx-dm-page-header">
+      <div>
+        <span class="gx-dm-eyebrow">GRADE X ARENA</span>
+        <h2>Messages</h2>
+        <p>Your private conversations</p>
       </div>
 
-      <div class="gx-dm-search-wrap gx-modern-search">
-        <span aria-hidden="true">⌕</span>
-        <input
-          type="search"
-          id="gxDMSearch"
-          placeholder="Search students..."
-          autocomplete="off"
-        >
-      </div>
+      <button type="button" id="gxDMNewChat"
+        class="gx-dm-icon-btn" aria-label="New chat">＋</button>
+    </header>
 
-      <div id="gxDMStudentResults" hidden></div>
+    <div class="gx-dm-search-wrap">
+      <span>⌕</span>
+      <input type="search" id="gxDMSearch"
+        placeholder="Search students..." autocomplete="off">
+    </div>
 
-      <div class="gx-dm-inbox-label">
-        <span>YOUR CONVERSATIONS</span>
-      </div>
+    <div id="gxDMStudentResults" hidden></div>
 
-      <div id="gxDMConversationList">
-        <div class="gx-dm-loading">
-          Your conversations will appear here.
-        </div>
-      </div>
+    <div class="gx-dm-navigation">
+      <button type="button" id="gxDMChatsButton" class="active">
+        Chats
+      </button>
 
-    </aside>
+      <button type="button" id="gxDMRequestsButton">
+        Requests <span id="gxDMRequestCount"></span>
+      </button>
+    </div>
 
-    <!-- ACTIVE CHAT -->
-    <section class="gx-dm-chat gx-modern-chat">
+    <div class="gx-dm-section-heading">
+      YOUR CONVERSATIONS
+    </div>
 
-      <header
-        id="gxDMChatHeader"
-        class="gx-dm-chat-header gx-modern-chat-header"
-      >
-        <div class="gx-dm-chat-placeholder">
-          <div class="gx-dm-empty-icon">✉</div>
-          <div>
-            <strong>Your messages</strong>
-            <p>Select a conversation to start chatting.</p>
-          </div>
-        </div>
-      </header>
-
-      <div
-        id="gxDMMessages"
-        class="gx-dm-message-list gx-modern-message-list"
-      >
-        <div class="gx-dm-welcome">
-        </div>
-      </div>
-
-      <form
-        id="gxDMComposeForm"
-        class="gx-dm-compose gx-modern-compose"
-      >
-        <textarea
-          id="gxDMMessageInput"
-          placeholder="Write a message..."
-          maxlength="5000"
-          rows="1"
-          required
-        ></textarea>
-
-        <button
-          type="submit"
-          id="gxDMSendButton"
-          aria-label="Send message"
-          title="Send message"
-        >
-          <span>➤</span>
-        </button>
-      </form>
-
-    </section>
+    <div id="gxDMConversationList" class="gx-dm-list">
+      <p class="gx-dm-status">Your conversations will appear here.</p>
+    </div>
 
   </div>
+
+
+  <!-- SCREEN 2: INDIVIDUAL CHAT -->
+  <div id="gxDMChatScreen" class="gx-dm-screen" hidden>
+
+    <div class="gx-dm-chat-shell">
+
+      <header id="gxDMChatHeader" class="gx-dm-chat-header">
+
+        <button type="button" id="gxDMBackButton"
+          class="gx-dm-icon-btn" aria-label="Back to messages">
+          ←
+        </button>
+
+      </header>
+
+      <div id="gxDMMessages" class="gx-dm-message-list">
+        <p class="gx-dm-status">Open a conversation to see messages.</p>
+      </div>
+
+      <form id="gxDMComposeForm" class="gx-dm-compose">
+
+        <textarea id="gxDMMessageInput"
+          placeholder="Write a message..."
+          maxlength="5000" rows="1" required></textarea>
+
+        <button type="submit" id="gxDMSendButton"
+          aria-label="Send message" title="Send message">
+          ➤
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- SCREEN 3: MESSAGE REQUESTS -->
+  <div id="gxDMRequestsScreen" class="gx-dm-screen" hidden>
+
+    <header class="gx-dm-page-header">
+
+      <button type="button" id="gxDMRequestsBackButton"
+        class="gx-dm-icon-btn" aria-label="Back to messages">
+        ←
+      </button>
+
+      <div>
+        <span class="gx-dm-eyebrow">GRADE X ARENA</span>
+        <h2>Message Requests</h2>
+        <p>People who want to connect with you</p>
+      </div>
+
+    </header>
+
+    <div id="gxDMRequestsList" class="gx-dm-list">
+      <p class="gx-dm-status">No new message requests.</p>
+    </div>
+
+  </div>
+
 </section>
-<!-- END GRADE X PRIVATE MESSAGING UI -->
+
+<!-- END GRADE X WHATSAPP STYLE PRIVATE MESSAGING -->
+
 
 <!-- SOCIAL PROFILE -->
 <!-- SOCIAL PROFILE -->

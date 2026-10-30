@@ -716,7 +716,7 @@ async function openPublicStudentProfile(studentId) {
             if (avatarFallback) avatarFallback.hidden = true;
         }
 
-                if (student.created_at && joinedElement) {
+        if (student.created_at && joinedElement) {
             joinedElement.textContent =
                 "Joined " +
                 new Date(student.created_at).toLocaleDateString();
@@ -956,7 +956,7 @@ if (closeReader) {
 
 
 // ============================================
-// 13. GRADE BOT
+// 13. GRADE BOT (Upgraded Design System UI Integration)
 // ============================================
 
 const chatForm = getElement("chatForm");
@@ -1021,15 +1021,37 @@ if (chatForm && chatInput && chatMessages) {
             return String(doc.id) === String(selectedPdfId);
         });
 
-        const userMessage = document.createElement("div");
-        userMessage.className = "user-message";
-        userMessage.textContent = question;
-        chatMessages.appendChild(userMessage);
+        // Append user message using design system UI structure (msg msg--out)
+        const userMsgLi = document.createElement("li");
+        userMsgLi.className = "msg msg--out";
+        userMsgLi.innerHTML = `
+            <div class="avatar avatar--sm avatar--alt2" aria-hidden="true">You</div>
+            <div class="msg__body">
+                <div class="bubble">
+                    <p>${escapeHTML(question)}</p>
+                </div>
+                <div class="msg__meta">
+                    <time>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>
+                    <span class="receipt" aria-label="Sent">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+                    </span>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(userMsgLi);
 
-        const botMessage = document.createElement("div");
-        botMessage.className = "bot-message";
-        botMessage.textContent = "GRADE BOT is thinking... 🤖";
-        chatMessages.appendChild(botMessage);
+        // Append typing indicator for bot
+        const botMsgLi = document.createElement("li");
+        botMsgLi.className = "msg msg--in";
+        botMsgLi.innerHTML = `
+            <div class="avatar avatar--sm avatar--alt" aria-hidden="true">🤖</div>
+            <div class="msg__body">
+                <div class="typing" aria-label="GRADE BOT is typing">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(botMsgLi);
 
         chatInput.value = "";
         chatInput.disabled = true;
@@ -1049,7 +1071,6 @@ if (chatForm && chatInput && chatMessages) {
 
                 pdfContext = await extractPdfText(selectedPdf);
 
-                // SPEED BOOST: Trim context to roughly 8,000 characters max
                 if (pdfContext.length > 8000) {
                     pdfContext = pdfContext.slice(0, 8000) + "\n[Content truncated for speed]";
                 }
@@ -1065,7 +1086,7 @@ if (chatForm && chatInput && chatMessages) {
                 }
             }
 
-                        const response = await fetch("https://vkojdzbhautxwcujmjiu.supabase.co/functions/v1/dynamic-function", {
+            const response = await fetch("https://vkojdzbhautxwcujmjiu.supabase.co/functions/v1/dynamic-function", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -1084,20 +1105,38 @@ if (chatForm && chatInput && chatMessages) {
                 throw new Error(data?.error || "Couldn't connect to GRADE BOT. Please try again.");
             }
 
-
             if (!data || !data.answer) {
                 throw new Error(
                     data?.error || "GRADE BOT returned no answer."
                 );
             }
 
-            botMessage.textContent = data.answer;
+            // Replace typing indicator with bot response bubble
+            botMsgLi.innerHTML = `
+                <div class="avatar avatar--sm avatar--alt" aria-hidden="true">🤖</div>
+                <div class="msg__body">
+                    <div class="bubble">
+                        <p>${escapeHTML(data.answer)}</p>
+                    </div>
+                    <div class="msg__meta">
+                        <time>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>
+                    </div>
+                </div>
+            `;
         } catch (error) {
             console.error("GRADE BOT error:", error);
 
-            botMessage.textContent =
-                error.message ||
-                "GRADE BOT couldn't respond. Please try again.";
+            botMsgLi.innerHTML = `
+                <div class="avatar avatar--sm avatar--alt" aria-hidden="true">🤖</div>
+                <div class="msg__body">
+                    <div class="bubble" style="border-color: rgba(251, 113, 133, 0.4);">
+                        <p>${escapeHTML(error.message || "GRADE BOT couldn't respond. Please try again.")}</p>
+                    </div>
+                    <div class="msg__meta">
+                        <time>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>
+                    </div>
+                </div>
+            `;
 
             if (selectedPdf && botPDFStatus) {
                 showMessage(
@@ -1344,7 +1383,7 @@ function renderProfile() {
     const metadata = currentUser.user_metadata || {};
     const displayName = metadata.display_name || "GRADE X Student";
     const avatarUrl = metadata.avatar_url || "";
-        if (avatarUrl && profileAvatarImage) {
+    if (avatarUrl && profileAvatarImage) {
         profileAvatarImage.src = avatarUrl;
         profileAvatarImage.hidden = false;
 
@@ -1364,7 +1403,6 @@ function renderProfile() {
 
     if (profileStatus) profileStatus.textContent = "";
 
-    // ADD THIS RIGHT HERE:
     if (currentUser && currentUser.id) {
         loadProfileFollowStats(currentUser.id, "gxProfileFollowerCount", "gxProfileFollowingCount");
     }
@@ -1518,7 +1556,7 @@ if (saveProfileBtn) {
             return;
         }
 
-                const displayName = profileNameInput
+        const displayName = profileNameInput
             ? profileNameInput.value.trim()
             : "";
 
@@ -1538,7 +1576,6 @@ if (saveProfileBtn) {
             return;
         }
 
-        // AUTO-GENERATE USERNAME IF BLANK
         if (!usernameInput) {
             const emailPrefix = currentUser.email 
                 ? currentUser.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '') 
@@ -1546,7 +1583,6 @@ if (saveProfileBtn) {
             const randomSuffix = Math.floor(1000 + Math.random() * 9000);
             usernameInput = `${emailPrefix}_${randomSuffix}`.slice(0, 20);
         }
-
 
         if (
             usernameInput &&
@@ -3068,108 +3104,7 @@ async function loadGXProfilePosts() {
 
   console.log("GRADE X DM interface connected.");
 })();
-/* ==========================================
-   GRADE X — INSTAGRAM FOLLOW & STATS SYSTEM
-========================================== */
 
-async function loadProfileFollowStats(profileUserId, followerElId, followingElId) {
-    const followerEl = document.getElementById(followerElId);
-    const followingEl = document.getElementById(followingElId);
-
-    if (!profileUserId) return;
-
-    // Fetch Followers count
-    const { count: followers } = await db
-        .from("gx_follows")
-        .select("*", { count: "exact", head: true })
-        .eq("following_id", profileUserId);
-
-    // Fetch Following count
-    const { count: following } = await db
-        .from("gx_follows")
-        .select("*", { count: "exact", head: true })
-        .eq("follower_id", profileUserId);
-
-    if (followerEl) followerEl.textContent = followers || 0;
-    if (followingEl) followingEl.textContent = following || 0;
-}
-
-async function setupPublicStudentFollow(profileUserId) {
-    const container = document.getElementById("publicStudentFollowContainer");
-    const btn = document.getElementById("publicStudentFollowBtn");
-
-    if (!container || !btn || !currentUser) {
-        if (container) container.hidden = true;
-        return;
-    }
-
-    // Hide follow button if viewing your own profile
-    if (currentUser.id === profileUserId) {
-        container.hidden = true;
-        return;
-    }
-
-    container.hidden = false;
-
-    // Check if current user already follows this student
-    const { data: existing } = await db
-        .from("gx_follows")
-        .select("*")
-        .eq("follower_id", currentUser.id)
-        .eq("following_id", profileUserId)
-        .maybeSingle();
-
-    let isFollowing = !!existing;
-    updateFollowBtnUI(btn, isFollowing);
-
-    // Clean clone to prevent duplicate event listeners
-    const newBtn = btn.cloneNode(true);
-    btn.parentNode.replaceChild(newBtn, btn);
-
-    newBtn.addEventListener("click", async function () {
-        newBtn.disabled = true;
-
-        if (isFollowing) {
-            // Unfollow action
-            const { error } = await db
-                .from("gx_follows")
-                .delete()
-                .eq("follower_id", currentUser.id)
-                .eq("following_id", profileUserId);
-
-            if (!error) {
-                isFollowing = false;
-                updateFollowBtnUI(newBtn, false);
-                loadProfileFollowStats(profileUserId, "publicStudentFollowerCount", "publicStudentFollowingCount");
-            }
-        } else {
-            // Follow action
-            const { error } = await db
-                .from("gx_follows")
-                .insert({
-                    follower_id: currentUser.id,
-                    following_id: profileUserId
-                });
-
-            if (!error) {
-                isFollowing = true;
-                updateFollowBtnUI(newBtn, true);
-                loadProfileFollowStats(profileUserId, "publicStudentFollowerCount", "publicStudentFollowingCount");
-            }
-        }
-        newBtn.disabled = false;
-    });
-}
-
-function updateFollowBtnUI(btn, isFollowing) {
-    if (isFollowing) {
-        btn.textContent = "Following";
-        btn.classList.add("is-following");
-    } else {
-        btn.textContent = "Follow";
-        btn.classList.remove("is-following");
-    }
-}
 /* ==========================================
    GRADE X — INSTAGRAM FOLLOW & STATS SYSTEM
 ========================================== */
@@ -3201,11 +3136,9 @@ async function setupPublicStudentFollow(profileUserId) {
     const btn = document.getElementById("publicStudentFollowBtn");
     if (!btn) return;
 
-    // Force button to stay visible
     btn.style.display = "block";
     btn.disabled = false;
 
-    // Hide if viewing your own profile
     if (currentUser && currentUser.id === profileUserId) {
         btn.style.display = "none";
         return;
@@ -3226,7 +3159,6 @@ async function setupPublicStudentFollow(profileUserId) {
 
     updateFollowBtnUI(btn, isFollowing);
 
-    // Clean clone to prevent duplicate event listeners
     const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
 
@@ -3283,4 +3215,3 @@ function updateFollowBtnUI(btn, isFollowing) {
         btn.style.background = "";
     }
 }
-{}
