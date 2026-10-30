@@ -1978,265 +1978,620 @@ footer p:last-child {
     pointer-events: none;
 }
 
-/* ============================================
-   GRADE X — FULL PAGE DIRECT MESSAGES STYLING
-============================================ */
+
+/* =========================================
+   GRADE X — MODERN PRIVATE MESSAGING UI
+========================================= */
+
+#gxMessagesView[hidden] {
+  display: none !important;
+}
 
 #gxMessagesView {
-    display: flex;
-    flex-direction: column;
-    background: #0f1015;
-    color: #f3f4f6;
-    border-radius: 0;
-    border: none;
-    overflow: hidden;
-    position: fixed;
-    top: 65px;
-    left: 0;
-    right: 0;
-    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
-    z-index: 40;
-    width: 100%;
-    margin: 0;
-    box-shadow: none;
+  position: fixed;
+  top: 65px;
+  left: 0;
+  right: 0;
+  bottom: 75px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(118, 40, 232, .16), transparent 35%),
+    radial-gradient(circle at 100% 100%, rgba(40, 120, 255, .12), transparent 35%),
+    #090914;
+  color: #fff;
 }
+
+.gx-modern-layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  gap: 1px;
+  overflow: hidden;
+  background: rgba(255,255,255,.06);
+}
+
+/* INBOX */
+
+.gx-modern-inbox {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 360px;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: rgba(17, 16, 34, .96);
+  border-right: 1px solid rgba(255,255,255,.08);
+}
+
+.gx-modern-inbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 18px 16px;
+}
+
+.gx-modern-inbox-header > button:first-child {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  background: rgba(255,255,255,.06);
+  color: #fff;
+  font-size: 21px;
+  cursor: pointer;
+}
+
+.gx-dm-heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.gx-dm-eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  color: #b78cff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.gx-dm-heading h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.gx-dm-heading p {
+  margin: 5px 0 0;
+  color: #9693ad;
+  font-size: 12px;
+}
+
+.gx-dm-new-chat {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7628e8, #2878ff);
+  color: #fff;
+  font-size: 27px;
+  box-shadow: 0 5px 20px rgba(118,40,232,.3);
+  cursor: pointer;
+}
+
+.gx-modern-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 16px 16px;
+  padding: 0 14px;
+  min-height: 46px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 15px;
+  background: rgba(255,255,255,.055);
+  color: #a78bfa;
+}
+
+.gx-modern-search span {
+  font-size: 23px;
+}
+
+.gx-modern-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 13px;
+}
+
+.gx-modern-search input::placeholder {
+  color: #77748e;
+}
+
+.gx-dm-inbox-label {
+  padding: 5px 18px 12px;
+  color: #77748e;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+#gxDMStudentResults,
+#gxDMConversationList {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+#gxDMStudentResults:not([hidden]) {
+  max-height: 42%;
+  margin: 0 10px 12px;
+  padding: 5px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 15px;
+  background: rgba(255,255,255,.035);
+}
+
+#gxDMConversationList {
+  flex: 1;
+  padding: 0 9px 12px;
+}
+
+/* DYNAMIC CONVERSATION AND SEARCH ITEMS */
+
+.gx-dm-conversation,
+.gx-dm-student-result {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 11px;
+  margin-bottom: 5px;
+  padding: 11px;
+  border: 1px solid transparent;
+  border-radius: 15px;
+  background: transparent;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease;
+}
+
+.gx-dm-conversation:hover,
+.gx-dm-student-result:hover {
+  background: rgba(255,255,255,.06);
+}
+
+.gx-dm-conversation.active,
+.gx-dm-conversation.selected {
+  border-color: rgba(167,139,250,.2);
+  background: linear-gradient(110deg, rgba(118,40,232,.2), rgba(40,120,255,.09));
+}
+
 .gx-dm-avatar {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    max-width: 44px !important;
-    border-radius: 50% !important;
-    overflow: hidden !important;
-    flex-shrink: 0 !important;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  overflow: hidden;
+  border: 2px solid rgba(167,139,250,.5);
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7628e8, #2878ff);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
 }
 
-.gx-dm-avatar img,
-.gx-dm-avatar div {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    border-radius: 50% !important;
+.gx-dm-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.gx-dm-layout {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    flex: 1;
-    min-height: 0;
+.gx-dm-student-details {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
-.gx-dm-sidebar {
-    background: #12141c;
-    border-right: 1px solid rgba(255, 255, 255, 0.06);
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    height: 100%;
-    width: 340px;
-    min-width: 340px;
+.gx-dm-student-details strong {
+  display: block;
+  overflow: hidden;
+  color: #f5f3ff;
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.gx-dm-search-box {
-    padding: 12px 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    flex-shrink: 0;
+.gx-dm-student-details small,
+.gx-dm-student-details span {
+  display: block;
+  margin-top: 5px;
+  overflow: hidden;
+  color: #9693ad;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.gx-dm-search-box input {
-    width: 100%;
-    margin: 0;
-    padding: 9px 12px;
-    background: #1a1d28;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    color: #fff;
-    font-size: 13px;
-    outline: none;
+.gx-dm-loading {
+  padding: 24px 12px;
+  color: #9693ad;
+  font-size: 12px;
+  text-align: center;
 }
 
-.gx-dm-tabs {
-    display: flex;
-    padding: 6px 12px;
-    gap: 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    flex-shrink: 0;
+/* CHAT PANEL */
+
+.gx-modern-chat {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(118,40,232,.09), transparent 45%),
+    #0d0c19;
 }
 
-.gx-dm-tabs button {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: #8a8f98;
-    padding: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
+.gx-modern-chat-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  min-height: 76px;
+  padding: 13px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  background: rgba(17,16,34,.75);
 }
 
-.gx-dm-tabs button.active {
-    background: rgba(167, 139, 250, 0.1);
-    color: #a78bfa;
+.gx-dm-chat-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 13px;
 }
 
-#gxDMConversationList,
-#gxDMStudentResults {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;
-    min-height: 0;
+.gx-dm-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 43px;
+  height: 43px;
+  border: 1px solid rgba(167,139,250,.25);
+  border-radius: 14px;
+  background: rgba(118,40,232,.14);
+  color: #c4a5ff;
+  font-size: 22px;
 }
 
-.gx-dm-chat-pane {
-    display: flex;
-    flex-direction: column;
-    background: #0f1015;
-    position: relative;
-    overflow: hidden;
-    height: 100%;
-    min-width: 0;
-    flex: 1;
+.gx-dm-chat-placeholder strong {
+  display: block;
+  color: #fff;
+  font-size: 15px;
 }
 
-#gxDMChatHeader {
-    padding: 10px 14px;
-    background: #12141c;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 2;
-    flex-shrink: 0;
+.gx-dm-chat-placeholder p {
+  margin: 5px 0 0;
+  color: #9693ad;
+  font-size: 11px;
 }
 
-.gx-dm-back-btn {
-    background: transparent;
-    border: none;
-    color: #a78bfa;
-    font-size: 18px;
-    cursor: pointer;
-    display: none;
-    padding: 2px 6px;
-    align-items: center;
-    justify-content: center;
+/* ACTIVE CHAT HEADER CONTENT */
+
+.gx-dm-header-person {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
 }
 
-#gxDMMessages {
-    flex: 1;
-    padding: 14px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    background: #0f1015;
-    min-height: 0;
+.gx-dm-header-person strong {
+  display: block;
+  overflow: hidden;
+  color: #fff;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gx-dm-header-person small {
+  display: block;
+  margin-top: 4px;
+  color: #aaa5c2;
+  font-size: 11px;
+}
+
+/* CHAT HISTORY */
+
+.gx-modern-message-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 22px clamp(12px, 4vw, 35px);
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(167,139,250,.3) transparent;
+}
+
+.gx-dm-welcome {
+  margin: auto;
 }
 
 .gx-dm-bubble {
-    max-width: 80%;
-    padding: 9px 12px;
-    border-radius: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    font-size: 13px;
+  position: relative;
+  max-width: min(75%, 520px);
+  padding: 11px 14px 8px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 17px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  animation: gxMessageAppear .18s ease-out;
+}
+
+.gx-dm-bubble p {
+  margin: 0;
+  color: #f8f7ff;
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.gx-dm-bubble small {
+  display: block;
+  margin-top: 6px;
+  color: rgba(255,255,255,.58);
+  font-size: 9px;
+  text-align: right;
 }
 
 .gx-dm-bubble-incoming {
-    background: #1a1d28;
-    color: #f3f4f6;
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
+  align-self: flex-start;
+  border-bottom-left-radius: 5px;
+  background: rgba(255,255,255,.075);
 }
 
 .gx-dm-bubble-outgoing {
-    background: #7c3aed;
-    color: #fff;
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
+  align-self: flex-end;
+  border-color: rgba(167,139,250,.2);
+  border-bottom-right-radius: 5px;
+  background: linear-gradient(135deg, #6421c8, #315dcc);
+  box-shadow: 0 5px 18px rgba(80,40,180,.13);
 }
 
-#gxDMComposeForm {
-    padding: 8px 14px;
-    background: #12141c;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
+/* MESSAGE REQUESTS */
+
+.gx-dm-request-note {
+  margin: 12px 18px;
+  padding: 13px;
+  border: 1px solid rgba(167,139,250,.2);
+  border-radius: 13px;
+  background: rgba(118,40,232,.1);
+  color: #d9ccff;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
-#gxDMMessageInput {
+.gx-dm-request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 10px 18px;
+}
+
+.gx-dm-accept,
+.gx-dm-decline {
+  min-height: 37px;
+  padding: 0 17px;
+  border: 0;
+  border-radius: 11px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.gx-dm-accept {
+  background: linear-gradient(135deg, #7628e8, #2878ff);
+}
+
+.gx-dm-decline {
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.07);
+}
+
+/* CHAT COMPOSER */
+
+.gx-modern-compose {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-end;
+  gap: 10px;
+  margin: 12px 16px 15px;
+  padding: 8px 9px 8px 15px;
+  border: 1px solid rgba(167,139,250,.18);
+  border-radius: 19px;
+  background: rgba(255,255,255,.055);
+  box-shadow: 0 8px 28px rgba(0,0,0,.15);
+}
+
+.gx-modern-compose textarea {
+  flex: 1;
+  min-width: 0;
+  max-height: 120px;
+  min-height: 38px;
+  resize: vertical;
+  padding: 10px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.gx-modern-compose textarea::placeholder {
+  color: #85819e;
+}
+
+.gx-modern-compose button {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7628e8, #2878ff);
+  color: #fff;
+  font-size: 20px;
+  box-shadow: 0 5px 15px rgba(118,40,232,.3);
+  cursor: pointer;
+  transition: transform .2s ease, opacity .2s ease;
+}
+
+.gx-modern-compose button:active {
+  transform: scale(.93);
+}
+
+.gx-modern-compose button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* SCROLLBARS */
+
+#gxDMConversationList::-webkit-scrollbar,
+#gxDMStudentResults::-webkit-scrollbar,
+.gx-modern-message-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+#gxDMConversationList::-webkit-scrollbar-thumb,
+#gxDMStudentResults::-webkit-scrollbar-thumb,
+.gx-modern-message-list::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: rgba(167,139,250,.25);
+}
+
+/* ANIMATION */
+
+@keyframes gxMessageAppear {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* MOBILE RESPONSIVENESS */
+
+@media (max-width: 700px) {
+  #gxMessagesView {
+    top: 60px;
+    bottom: 70px;
+  }
+
+  .gx-modern-layout {
+    flex-direction: column;
+  }
+
+  .gx-modern-inbox {
+    flex: 0 0 43%;
+    min-height: 190px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+
+  .gx-modern-inbox-header {
+    padding: 12px 14px 10px;
+  }
+
+  .gx-dm-heading h2 {
+    font-size: 21px;
+  }
+
+  .gx-modern-search {
+    min-height: 40px;
+    margin: 3px 13px 9px;
+  }
+
+  .gx-dm-inbox-label {
+    padding: 3px 15px 8px;
+  }
+
+  #gxDMConversationList {
+    padding: 0 7px 8px;
+  }
+
+  .gx-dm-conversation,
+  .gx-dm-student-result {
+    padding: 8px;
+  }
+
+  .gx-dm-avatar {
+    width: 38px;
+    height: 38px;
+  }
+
+  .gx-modern-chat {
     flex: 1;
-    width: 0;
-    min-width: 0;
-    margin: 0;
-    background: #1a1d28;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    padding: 9px 14px;
-    color: #fff;
-    font-size: 13px;
-    outline: none;
+  }
+
+  .gx-modern-chat-header {
+    min-height: 60px;
+    padding: 9px 13px;
+  }
+
+  .gx-modern-message-list {
+    padding: 14px 12px;
+  }
+
+  .gx-dm-bubble {
+    max-width: 86%;
+  }
+
+  .gx-modern-compose {
+    margin: 8px 10px 10px;
+  }
 }
 
-#gxDMSendButton {
-    background: transparent;
-    color: #a78bfa;
-    border: none;
-    font-weight: 600;
-    font-size: 13px;
-    padding: 6px 10px;
-    cursor: pointer;
-    flex-shrink: 0;
+@media (max-width: 380px) {
+  .gx-modern-inbox {
+    flex-basis: 40%;
+  }
+
+  .gx-dm-heading h2 {
+    font-size: 19px;
+  }
+
+  .gx-dm-heading p {
+    font-size: 10px;
+  }
+
+  .gx-dm-bubble p {
+    font-size: 12px;
+  }
 }
-
-@media (max-width: 768px) {
-    #gxMessagesView {
-        top: 55px;
-        bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
-    }
-
-    .gx-dm-layout {
-        position: relative;
-    }
-
-    .gx-dm-sidebar {
-        width: 100%;
-        min-width: 100%;
-        height: 100%;
-    }
-    
-    .gx-dm-chat-pane {
-        display: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 20;
-        background: #0f1015;
-    }
-    
-    .gx-dm-chat-open .gx-dm-sidebar {
-        display: none;
-    }
-    
-    .gx-dm-chat-open .gx-dm-chat-pane {
-        display: flex;
-    }
-    
-    .gx-dm-back-btn {
-        display: flex;
-    }
-}
-
 
 /* =========================================
    GRADE X — INSTAGRAM FOLLOW BUTTON STYLES

@@ -622,28 +622,32 @@ body.gx-modal-open {
   <div class="feature-note">Searching student profiles and posts will be enabled when social search is connected to the backend.</div>
 </section>
 
-<!-- MESSAGES -->
+<!-- GRADE X — NEW PRIVATE MESSAGING UI -->
+<section id="gxMessagesView" class="social-view gx-messages-screen" hidden>
 
+  <div class="gx-dm-layout gx-modern-layout">
 
-<!-- MESSAGES -->
+    <!-- INBOX / STUDENT SEARCH -->
+    <aside class="gx-dm-inbox gx-modern-inbox">
 
-<section id="gxMessagesView" class="social-view" hidden>
-  <div class="gx-dm-layout">
-    <aside class="gx-dm-inbox">
-      <div class="gx-dm-inbox-header">
+      <div class="gx-dm-inbox-header gx-modern-inbox-header">
+        <div class="gx-dm-heading">
+          <span class="gx-dm-eyebrow">GRADE X ARENA</span>
+          <h2>Messages</h2>
+          <p>Your private conversations</p>
+        </div>
+
         <button
           type="button"
-          id="gxDMBackButton"
-          aria-label="Back to Home"
-          title="Back to Home"
-        >←</button>
-
-        <h2>Messages</h2>
-
-        <button type="button" id="gxDMNewChat">＋</button>
+          id="gxDMNewChat"
+          class="gx-dm-new-chat"
+          aria-label="Start a new conversation"
+          title="New message"
+        >＋</button>
       </div>
 
-      <div class="gx-dm-search-wrap">
+      <div class="gx-dm-search-wrap gx-modern-search">
+        <span aria-hidden="true">⌕</span>
         <input
           type="search"
           id="gxDMSearch"
@@ -654,15 +658,27 @@ body.gx-modal-open {
 
       <div id="gxDMStudentResults" hidden></div>
 
-      <div id="gxDMConversationList">
-        <div class="gx-dm-loading">Your conversations will appear here.</div>
+      <div class="gx-dm-inbox-label">
+        <span>YOUR CONVERSATIONS</span>
       </div>
+
+      <div id="gxDMConversationList">
+        <div class="gx-dm-loading">
+          Your conversations will appear here.
+        </div>
+      </div>
+
     </aside>
 
-    <section class="gx-dm-chat">
-      <header id="gxDMChatHeader" class="gx-dm-chat-header">
+    <!-- ACTIVE CHAT -->
+    <section class="gx-dm-chat gx-modern-chat">
+
+      <header
+        id="gxDMChatHeader"
+        class="gx-dm-chat-header gx-modern-chat-header"
+      >
         <div class="gx-dm-chat-placeholder">
-          <span>💬</span>
+          <div class="gx-dm-empty-icon">✉</div>
           <div>
             <strong>Your messages</strong>
             <p>Select a conversation to start chatting.</p>
@@ -670,12 +686,18 @@ body.gx-modal-open {
         </div>
       </header>
 
-      <div id="gxDMMessages" class="gx-dm-message-list">
+      <div
+        id="gxDMMessages"
+        class="gx-dm-message-list gx-modern-message-list"
+      >
         <div class="gx-dm-welcome">
         </div>
       </div>
 
-      <form id="gxDMComposeForm" class="gx-dm-compose">
+      <form
+        id="gxDMComposeForm"
+        class="gx-dm-compose gx-modern-compose"
+      >
         <textarea
           id="gxDMMessageInput"
           placeholder="Write a message..."
@@ -683,11 +705,22 @@ body.gx-modal-open {
           rows="1"
           required
         ></textarea>
-        <button type="submit" id="gxDMSendButton">Send</button>
+
+        <button
+          type="submit"
+          id="gxDMSendButton"
+          aria-label="Send message"
+          title="Send message"
+        >
+          <span>➤</span>
+        </button>
       </form>
+
     </section>
+
   </div>
 </section>
+<!-- END GRADE X PRIVATE MESSAGING UI -->
 
 <!-- SOCIAL PROFILE -->
 <!-- SOCIAL PROFILE -->
