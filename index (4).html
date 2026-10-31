@@ -562,33 +562,66 @@ body.gx-modal-open {
 <section id="appSection" hidden>
 
 <!-- HOME -->
+<!-- HOME -->
 <section id="gxHomeView" class="social-view">
+
+  <!-- Welcome -->
   <div class="feed-welcome">
     <h2>Welcome to GRADE X 👋</h2>
     <p id="gxHomeGreeting">Your space to learn, connect and grow.</p>
   </div>
 
+  <!-- Instagram-style Stories -->
   <section class="stories-section">
-    <div class="stories-heading"><h3>Statuses</h3><span>Student updates</span></div>
-    <div class="stories-row">
+    <div class="stories-heading">
+      <h3>Statuses</h3>
+      <span>Student updates</span>
+    </div>
+
+    <div class="stories-row" id="gxStoriesRow">
+      <!-- Your Story -->
       <div class="story-item">
         <button type="button" data-open-view="create">
-          <div class="story-ring"><div class="story-avatar">＋</div><span class="story-add">+</span></div>
+          <div class="story-ring your-story-ring">
+            <div class="story-avatar" id="gxYourStoryAvatar">＋</div>
+            <span class="story-add">+</span>
+          </div>
           <p>Your status</p>
         </button>
       </div>
-      <div class="story-item"><button type="button" disabled><div class="story-ring"><div class="story-avatar">🎓</div></div><p>Students</p></button></div>
-      <div class="story-item"><button type="button" disabled><div class="story-ring"><div class="story-avatar">📚</div></div><p>Study</p></button></div>
-      <div class="story-item"><button type="button" disabled><div class="story-ring"><div class="story-avatar">🏆</div></div><p>Arena</p></button></div>
+
+      <!-- Extra static stories (optional) -->
+      <div class="story-item">
+        <button type="button" disabled>
+          <div class="story-ring"><div class="story-avatar">🎓</div></div>
+          <p>Students</p>
+        </button>
+      </div>
+      <div class="story-item">
+        <button type="button" disabled>
+          <div class="story-ring"><div class="story-avatar">📚</div></div>
+          <p>Study</p>
+        </button>
+      </div>
+      <div class="story-item">
+        <button type="button" disabled>
+          <div class="story-ring"><div class="story-avatar">🏆</div></div>
+          <p>Arena</p>
+        </button>
+      </div>
     </div>
   </section>
 
+  <!-- Quick compose (same as before) -->
   <div class="quick-compose">
     <div class="gx-avatar" id="gxFeedAvatar">👤</div>
-    <button type="button" data-open-view="create">Share something with your student community...</button>
+    <button type="button" data-open-view="create">
+      Share something with your student community...
+    </button>
     <button type="button" class="compose-plus" data-open-view="create" aria-label="Create post">＋</button>
   </div>
 
+  <!-- Social Feed -->
   <div id="gxHomeSocialFeed" class="gx-home-social-feed">
     <div class="empty-feed">
       <div class="empty-icon">💜</div>
@@ -597,143 +630,72 @@ body.gx-modal-open {
     </div>
   </div>
 
-
-  
-
+  <!-- Community notice -->
   <div class="notice-card">
     <h3>💜 GRADE X Community</h3>
     <p>Visit the public community website for news, discussions and announcements.</p>
-    <a href="https://kevinmorgan2949-dev.github.io/Grade-X-community-/" target="_blank" rel="noopener noreferrer">Visit Community ↗</a>
+    <a href="https://kevinmorgan2949-dev.github.io/Grade-X-community-/" target="_blank" rel="noopener noreferrer">
+      Visit Community ↗
+    </a>
   </div>
+
 </section>
-
-<!-- SEARCH -->
-<section id="gxSearchView" class="social-view" hidden>
-  <div class="page-heading"><h2>Explore</h2><p>Find study resources and learning tools.</p></div>
-  <div style="padding:0 16px">
-    <input id="gxExploreSearch" type="search" placeholder="🔎 Search study materials..." aria-label="Search study materials" style="width:100%;padding:14px;border:1px solid var(--border);border-radius:13px;background:var(--panel);color:white">
-  </div>
-  <div class="page-heading"><h2>Discover GRADE X</h2></div>
-  <div class="shortcut-list">
-    <button type="button" class="shortcut-item" data-open-view="library"><span class="shortcut-icon">📚</span><span><strong>Study Materials</strong><small>Search the existing PDF Library</small></span></button>
-    <button type="button" class="shortcut-item" data-open-view="bot"><span class="shortcut-icon">🤖</span><span><strong>Grade Bot</strong><small>Study with your AI assistant</small></span></button>
-    <button type="button" class="shortcut-item" data-open-view="arena"><span class="shortcut-icon">🏆</span><span><strong>Arena Games</strong><small>Play the knowledge quiz</small></span></button>
-  </div>
-  <div class="feature-note">Searching student profiles and posts will be enabled when social search is connected to the backend.</div>
-</section>
-
-
-<!-- GRADE X — WHATSAPP STYLE PRIVATE MESSAGING -->
-
-<section id="gxMessagesView" class="social-view gx-messages-screen" hidden>
-
-  <!-- SCREEN 1: CONVERSATION LIST -->
-  <div id="gxDMInboxScreen" class="gx-dm-screen">
-
-    <header class="gx-dm-page-header">
-      <div>
-        <span class="gx-dm-eyebrow">GRADE X ARENA</span>
-        <h2>Messages</h2>
-        <p>Your private conversations</p>
-      </div>
-
-      <button type="button" id="gxDMNewChat"
-        class="gx-dm-icon-btn" aria-label="New chat">＋</button>
+<!-- INSTAGRAM-STYLE MESSAGES (Connected to GRADE X) -->
+<section id="gxMessagesView" class="social-view ig-messages" hidden>
+  
+  <!-- ===== INBOX ===== -->
+  <div id="igInbox" class="ig-screen">
+    
+    <header class="ig-header">
+      <button type="button" class="ig-back" id="gxDMBackButton">←</button>
+      <h2>Messages</h2>
+      <button type="button" class="ig-new-chat" id="gxDMNewChat">✏️</button>
     </header>
-
-    <div class="gx-dm-search-wrap">
-      <span>⌕</span>
-      <input type="search" id="gxDMSearch"
-        placeholder="Search students..." autocomplete="off">
+    
+    <div class="ig-search-box">
+      <input type="search" id="gxDMSearch" placeholder="Search students..." autocomplete="off">
     </div>
-
-    <div id="gxDMStudentResults" hidden></div>
-
-    <div class="gx-dm-navigation">
-      <button type="button" id="gxDMChatsButton" class="active">
-        Chats
-      </button>
-
-      <button type="button" id="gxDMRequestsButton">
+    
+    <div id="gxDMStudentResults" class="ig-search-results" hidden></div>
+    
+    <div class="ig-tabs">
+      <button type="button" class="ig-tab active" id="gxDMChatsButton" data-filter="chats">Primary</button>
+      <button type="button" class="ig-tab" id="gxDMRequestsButton" data-filter="requests">
         Requests <span id="gxDMRequestCount"></span>
       </button>
     </div>
-
-    <div class="gx-dm-section-heading">
-      YOUR CONVERSATIONS
+    
+    <div id="gxDMConversationList" class="ig-chat-list">
+      <p class="ig-status">Loading conversations...</p>
     </div>
-
-    <div id="gxDMConversationList" class="gx-dm-list">
-      <p class="gx-dm-status">Your conversations will appear here.</p>
-    </div>
-
   </div>
-
-
-  <!-- SCREEN 2: INDIVIDUAL CHAT -->
-  <div id="gxDMChatScreen" class="gx-dm-screen" hidden>
-
-    <div class="gx-dm-chat-shell">
-
-      <header id="gxDMChatHeader" class="gx-dm-chat-header">
-
-        <button type="button" id="gxDMBackButton"
-          class="gx-dm-icon-btn" aria-label="Back to messages">
-          ←
-        </button>
-
-      </header>
-
-      <div id="gxDMMessages" class="gx-dm-message-list">
-        <p class="gx-dm-status">Open a conversation to see messages.</p>
+  
+  
+  <!-- ===== CHAT SCREEN ===== -->
+  <div id="igChatScreen" class="ig-screen" hidden>
+    
+    <header class="ig-chat-header" id="gxDMChatHeader">
+      <button type="button" class="ig-back" id="igChatBackBtn">←</button>
+      <div class="ig-chat-user">
+        <div class="ig-chat-avatar-wrap" id="igChatAvatar"></div>
+        <div>
+          <strong id="igChatName">Student</strong>
+          <span id="igChatStatus">GRADE X</span>
+        </div>
       </div>
-
-      <form id="gxDMComposeForm" class="gx-dm-compose">
-
-        <textarea id="gxDMMessageInput"
-          placeholder="Write a message..."
-          maxlength="5000" rows="1" required></textarea>
-
-        <button type="submit" id="gxDMSendButton"
-          aria-label="Send message" title="Send message">
-          ➤
-        </button>
-
-      </form>
-
-    </div>
-
-  </div>
-
-
-  <!-- SCREEN 3: MESSAGE REQUESTS -->
-  <div id="gxDMRequestsScreen" class="gx-dm-screen" hidden>
-
-    <header class="gx-dm-page-header">
-
-      <button type="button" id="gxDMRequestsBackButton"
-        class="gx-dm-icon-btn" aria-label="Back to messages">
-        ←
-      </button>
-
-      <div>
-        <span class="gx-dm-eyebrow">GRADE X ARENA</span>
-        <h2>Message Requests</h2>
-        <p>People who want to connect with you</p>
-      </div>
-
     </header>
-
-    <div id="gxDMRequestsList" class="gx-dm-list">
-      <p class="gx-dm-status">No new message requests.</p>
+    
+    <div id="gxDMMessages" class="ig-messages-area">
+      <p class="ig-status">Open a conversation to see messages.</p>
     </div>
-
+    
+    <form id="gxDMComposeForm" class="ig-compose">
+      <input type="text" id="gxDMMessageInput" placeholder="Message..." maxlength="5000" autocomplete="off" required>
+      <button type="submit" id="gxDMSendButton">Send</button>
+    </form>
   </div>
-
+  
 </section>
-
-<!-- END GRADE X WHATSAPP STYLE PRIVATE MESSAGING -->
-
 
 <!-- SOCIAL PROFILE -->
 <!-- SOCIAL PROFILE -->
