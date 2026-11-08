@@ -2473,27 +2473,30 @@ async function loadGXProfilePosts() {
 
 /* ==========================================
    GRADE X ARENA — PRIVATE MESSAGING
+   Matches the current igInbox / igChatScreen HTML
 ========================================== */
 (function () {
   "use strict";
 
   const el = id => document.getElementById(id);
-
+  const view = el("viewMessages");
+  const inbox = el("igInbox");
+  const chatScreen = el("igChatScreen");
+  const backButton = el("igChatBackBtn");
+  const chatAvatar = el("igChatAvatar");
+  const chatName = el("igChatName");
   const search = el("gxDMSearch");
   const results = el("gxDMStudentResults");
   const conversationList = el("gxDMConversationList");
-  const chatHeader = el("gxDMChatHeader");
   const messagesBox = el("gxDMMessages");
   const composeForm = el("gxDMComposeForm");
   const messageInput = el("gxDMMessageInput");
-  const sendButton = el("gxDMSendButton");
-  const newChatButton = el("gxDMNewChat");
+  const sendButton = composeForm ? composeForm.querySelector('button[type="submit"]') : null;
 
-  if (
-    !search || !results || !conversationList ||
-    !chatHeader || !messagesBox || !composeForm
-  ) {
-    console.warn("GRADE X DM: Messages HTML elements not found.");
+  if (!view || !inbox || !chatScreen || !backButton || !chatAvatar ||
+      !chatName || !search || !results || !conversationList ||
+      !messagesBox || !composeForm || !messageInput || !sendButton) {
+    console.warn("GRADE X DM: Current messaging HTML is incomplete.");
     return;
   }
 
@@ -2502,39 +2505,79 @@ async function loadGXProfilePosts() {
   let activeFilter = "chats";
   let searchTimer = null;
   let loadingMessages = false;
+  let chatStudent = null;
 
   const tabs = document.createElement("div");
   tabs.className = "gx-dm-tabs";
-
   [
     { id: "chats", label: "Chats" },
     { id: "requests", label: "Requests" }
-  ].forEach(function (item) {
+  ].forEach(item => {
     const button = document.createElement("button");
     button.type = "button";
     button.textContent = item.label;
     button.dataset.dmFilter = item.id;
-
-    button.addEventListener("click", function () {
+    button.addEventListener("click", () => {
       activeFilter = item.id;
-      tabs.querySelectorAll("button").forEach(function (tab) {
-        tab.classList.toggle("active", tab === button);
-      });
+      tabs.querySelectorAll("button").forEach(tab =>
+        tab.classList.toggle("active", tab === button));
       renderConversationList();
     });
-
     tabs.appendChild(button);
   });
+  conversationList.parentNode.insertBefore(tabs, conversationList);
 
-  conversationList.parentNode.insertBefore(
-    tabs,
-    conversationList
-  );
+  function showStatus(container, message) {
+    container.replaceChildren();
+    const p = document.createElement("p");
+    p.className = "gx-dm-status";
+    p.textContent = message;
+    container.appendChild(p);
+  }
+
+  function studentName(student) {
+    if (!student) return "GRADE X Student";
+    return student.display_name || student.full_name ||
+      (student.username ? "@" + student.username : "GRADE X Student");
+  }
+
+  function studentHandle(student) {
+    return student && student.username ? "@" + student.username : "GRADE X student";
+  }
+
+  function makeAvatar(student) {
+    const holder = document.createElement("div");
+    holder.className = "gx-dm-avatar";
+    if (student && student.avatar_url) {
+      const img = document.createElement("img");
+      img.src = student.avatar_url;
+      img.alt = "";
+      img.onerror = () => { img.remove(); holder.textContent = "👤"; };
+      holder.appendChild(img);
+    } else {
+      holder.textContent = "👤";
+    }
+    return holder;
+  }
+
+  function showInbox() {
+    chatScreen.hidden = true;
+    inbox.hidden = false;
+    activeConversation = null;
+    chatStudent = null;
+    messageInput.value = "";
+    messageInput.disabled = true;
+    sendButton.disabled = true;
+  }
+
+  function showChat() {
+    inbox.hidden = true;
+    chatScreen.hidden = false;
+  }
 
   function getOtherUser(conversation) {
     return conversation.user_a === currentUser.id
-      ? conversation.user_b
-      : conversation.user_a;
+      ? conversation.user_b : conversation.user_a;
   }
 
   function isIncomingRequest(conversation) {
@@ -2543,531 +2586,299 @@ async function loadGXProfilePosts() {
   }
 
   function isVisibleInFilter(conversation) {
-    if (activeFilter === "requests") {
-      return isIncomingRequest(conversation);
-    }
-
+    if (activeFilter === "requests") return isIncomingRequest(conversation);
     return conversation.request_status === "accepted" ||
-      (
-        conversation.request_status === "pending" &&
-        conversation.initiated_by === currentUser.id
-      );
-  }
-
-  function studentName(student) {
-    if (!student) return "GRADE X Student";
-
-    return student.display_name ||
-      student.full_name ||
-      (student.username ? "@" + student.username : "GRADE X Student");
-  }
-
-  function studentHandle(student) {
-    return student && student.username
-      ? "@" + student.username
-      : "GRADE X student";
-  }
-
-  function makeAvatar(student) {
-    const avatar = document.createElement("div");
-    avatar.className = "gx-dm-avatar";
-
-    if (student && student.avatar_url) {
-      const image = document.createElement("img");
-      image.src = student.avatar_url;
-      image.alt = "";
-      image.onerror = function () {
-        avatar.textContent = "👤";
-      };
-      avatar.appendChild(image);
-    } else {
-      avatar.textContent = "👤";
-    }
-
-    return avatar;
-  }
-
-  function showStatus(container, message) {
-    container.replaceChildren();
-    const paragraph = document.createElement("p");
-    paragraph.className = "gx-dm-status";
-    paragraph.textContent = message;
-    container.appendChild(paragraph);
+      (conversation.request_status === "pending" &&
+       conversation.initiated_by === currentUser.id);
   }
 
   async function searchStudents(query) {
     if (!currentUser) return;
-
     query = query.trim().replace(/^@/, "");
-
     if (query.length < 2) {
       results.hidden = true;
       results.replaceChildren();
       return;
     }
-
     results.hidden = false;
     showStatus(results, "Searching students...");
-
-    const { data, error } = await db.rpc(
-      "gx_search_chat_students",
-      { p_query: query }
-    );
-
+    const { data, error } = await db.rpc("gx_search_chat_students", { p_query: query });
     if (error) {
       console.error("GX student search:", error);
       showStatus(results, "Could not search students. Please try again.");
       return;
     }
-
     results.replaceChildren();
-
-    if (!data || data.length === 0) {
+    if (!data || !data.length) {
       showStatus(results, "No students found. Check the username and try again.");
       return;
     }
-
-    data.forEach(function (student) {
+    data.forEach(student => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "gx-dm-student-result";
-
-      const avatar = makeAvatar(student);
       const details = document.createElement("span");
       details.className = "gx-dm-student-details";
-
       const name = document.createElement("strong");
       name.textContent = studentName(student);
-
       const handle = document.createElement("small");
       handle.textContent = studentHandle(student);
-
       details.append(name, handle);
-      button.append(avatar, details);
-
-      button.addEventListener("click", function () {
-        startConversation(student);
-      });
-
+      button.append(makeAvatar(student), details);
+      button.addEventListener("click", () => startConversation(student));
       results.appendChild(button);
     });
   }
 
   async function startConversation(student) {
     if (!currentUser || !student || !student.id) return;
-
     results.hidden = false;
     showStatus(results, "Opening conversation...");
-
-    const { data, error } = await db.rpc(
-      "gx_start_conversation",
-      { p_other_user: student.id }
-    );
-
+    const { data, error } = await db.rpc("gx_start_conversation", {
+      p_other_user: student.id
+    });
     if (error) {
       console.error("GX start conversation:", error);
       showStatus(results, error.message || "Could not start this conversation.");
       return;
     }
-
     results.hidden = true;
     search.value = "";
-
+    const conversationId = typeof data === "string" ? data : data && data.id;
     await loadConversations();
-
-    const conversationId = typeof data === "string"
-      ? data
-      : data && data.id;
-
-    if (conversationId) {
-      await openConversation(conversationId);
-    }
+    if (conversationId) await openConversation(conversationId);
   }
 
   async function loadConversations() {
     if (!currentUser) return;
-
     conversationList.replaceChildren();
     showStatus(conversationList, "Loading conversations...");
-
-    const { data, error } = await db
-      .from("gx_conversations")
-      .select("*")
-      .or(
-        "user_a.eq." + currentUser.id +
-        ",user_b.eq." + currentUser.id
-      )
+    const { data, error } = await db.from("gx_conversations").select("*")
+      .or("user_a.eq." + currentUser.id + ",user_b.eq." + currentUser.id)
       .order("created_at", { ascending: false });
-
     if (error) {
       console.error("GX load conversations:", error);
       showStatus(conversationList, "Could not load conversations.");
       return;
     }
-
     conversations = data || [];
     await renderConversationList();
   }
 
   async function renderConversationList() {
     conversationList.replaceChildren();
-
     const visible = conversations.filter(isVisibleInFilter);
-
     const requestCount = conversations.filter(isIncomingRequest).length;
     const requestTab = tabs.querySelector('[data-dm-filter="requests"]');
-
-    if (requestTab) {
-      requestTab.textContent = requestCount
-        ? "Requests (" + requestCount + ")"
-        : "Requests";
-    }
-
-    if (visible.length === 0) {
-      showStatus(
-        conversationList,
-        activeFilter === "requests"
-          ? "No new message requests."
-          : "No chats yet. Search for a student to start a conversation."
-      );
+    if (requestTab) requestTab.textContent = requestCount ? "Requests (" + requestCount + ")" : "Requests";
+    if (!visible.length) {
+      showStatus(conversationList, activeFilter === "requests"
+        ? "No new message requests."
+        : "No chats yet. Search for a student to start a conversation.");
       return;
     }
-
-    const studentIds = [...new Set(visible.map(getOtherUser))];
-
-    const { data: students, error } = await db
-      .from("student_public_profiles")
-      .select("id,full_name,display_name,username,avatar_url")
-      .in("id", studentIds);
-
+    const ids = [...new Set(visible.map(getOtherUser))];
+    const { data: students, error } = await db.from("student_public_profiles")
+      .select("id,full_name,display_name,username,avatar_url").in("id", ids);
     if (error) {
       console.error("GX load student names:", error);
       showStatus(conversationList, "Could not load student profiles.");
       return;
     }
-
-    const studentMap = new Map(
-      (students || []).map(student => [student.id, student])
-    );
-
-    visible.forEach(function (conversation) {
+    const studentMap = new Map((students || []).map(student => [student.id, student]));
+    visible.forEach(conversation => {
       const student = studentMap.get(getOtherUser(conversation));
       const button = document.createElement("button");
       button.type = "button";
       button.className = "gx-dm-conversation";
-      button.classList.toggle(
-        "active",
-        conversation.id === activeConversation
-      );
-
-      const avatar = makeAvatar(student);
       const details = document.createElement("span");
       details.className = "gx-dm-student-details";
-
       const name = document.createElement("strong");
       name.textContent = studentName(student);
-
-      const handle = document.createElement("small");
-
-      if (isIncomingRequest(conversation)) {
-        handle.textContent = "New message request";
-      } else if (conversation.request_status === "pending") {
-        handle.textContent = "Request sent — awaiting response";
-      } else {
-        handle.textContent = studentHandle(student);
-      }
-
-      details.append(name, handle);
-      button.append(avatar, details);
-
-      button.addEventListener("click", function () {
-        openConversation(conversation.id);
-
-        const messagesView = document.getElementById("gxMessagesView");
-
-        if (messagesView) {
-          messagesView.classList.add("gx-dm-chat-open");
-        }
-      });
-
+      const sub = document.createElement("small");
+      sub.textContent = isIncomingRequest(conversation) ? "New message request" :
+        conversation.request_status === "pending" ? "Request sent — awaiting response" : studentHandle(student);
+      details.append(name, sub);
+      button.append(makeAvatar(student), details);
+      button.addEventListener("click", () => openConversation(conversation.id));
       conversationList.appendChild(button);
     });
   }
 
   async function openConversation(conversationId) {
     if (!currentUser) return;
-
-    const conversation = conversations.find(
-      item => item.id === conversationId
-    );
-
+    const conversation = conversations.find(item => item.id === conversationId);
     if (!conversation) {
       await loadConversations();
       return;
     }
-
     activeConversation = conversationId;
-
     const otherId = getOtherUser(conversation);
-
-    const { data: student, error } = await db
-      .from("student_public_profiles")
+    const { data: student, error } = await db.from("student_public_profiles")
       .select("id,full_name,display_name,username,avatar_url")
-      .eq("id", otherId)
-      .maybeSingle();
-
-    if (error) {
-      console.error("GX open student profile:", error);
-    }
-
-    chatHeader.replaceChildren();
-
-    const heading = document.createElement("div");
-    heading.className = "gx-dm-header-person";
-    heading.appendChild(makeAvatar(student));
-
-    const personDetails = document.createElement("div");
-    const name = document.createElement("strong");
-    name.textContent = studentName(student);
-
-    const handle = document.createElement("p");
-    handle.textContent = studentHandle(student);
-
-    personDetails.append(name, handle);
-    heading.appendChild(personDetails);
-    chatHeader.appendChild(heading);
-
+      .eq("id", otherId).maybeSingle();
+    if (error) console.error("GX open student profile:", error);
+    chatStudent = student || null;
+    chatAvatar.replaceChildren();
+    const avatar = makeAvatar(chatStudent);
+    chatAvatar.append(...avatar.childNodes);
+    chatName.textContent = studentName(chatStudent);
+    showChat();
     const incoming = isIncomingRequest(conversation);
-
+    messageInput.disabled = incoming || conversation.request_status !== "accepted";
+    sendButton.disabled = messageInput.disabled;
+    const oldNotice = chatScreen.querySelector(".gx-dm-request-panel");
+    if (oldNotice) oldNotice.remove();
     if (incoming) {
-      const requestNote = document.createElement("p");
-      requestNote.className = "gx-dm-request-note";
-      requestNote.textContent =
-        "This student wants to message you. Accept the request to reply.";
-      chatHeader.appendChild(requestNote);
-
-      const actions = document.createElement("div");
-      actions.className = "gx-dm-request-actions";
-
+      const panel = document.createElement("div");
+      panel.className = "gx-dm-request-panel";
+      const note = document.createElement("p");
+      note.textContent = "This student wants to message you. Accept the request to reply.";
+      panel.appendChild(note);
       [
         { label: "Accept", accept: true },
         { label: "Decline", accept: false }
-      ].forEach(function (item) {
+      ].forEach(item => {
         const button = document.createElement("button");
         button.type = "button";
         button.textContent = item.label;
-        button.className = item.accept
-          ? "gx-dm-accept"
-          : "gx-dm-decline";
-
-        button.addEventListener("click", async function () {
+        button.addEventListener("click", async () => {
           button.disabled = true;
-
-          const { error } = await db.rpc(
-            "gx_respond_message_request",
-            {
-              p_conversation_id: conversationId,
-              p_accept: item.accept
-            }
-          );
-
-          if (error) {
-            console.error("GX respond to request:", error);
-            window.alert(error.message || "Could not update the request.");
+          const { error: responseError } = await db.rpc("gx_respond_message_request", {
+            p_conversation_id: conversationId, p_accept: item.accept
+          });
+          if (responseError) {
+            console.error("GX respond request:", responseError);
+            alert(responseError.message || "Could not update the request.");
             button.disabled = false;
             return;
           }
-
           await loadConversations();
-
-          if (item.accept) {
-            await openConversation(conversationId);
-          } else {
-            activeConversation = null;
-            resetChat();
-          }
+          if (item.accept) await openConversation(conversationId);
+          else showInbox();
         });
-
-        actions.appendChild(button);
+        panel.appendChild(button);
       });
-
-      chatHeader.appendChild(actions);
+      chatScreen.insertBefore(panel, messagesBox);
     }
-
-    messageInput.disabled = incoming;
-    sendButton.disabled = incoming;
-
     await loadMessages(conversationId);
     await renderConversationList();
   }
 
   async function loadMessages(conversationId) {
     if (!currentUser || loadingMessages) return;
-
     loadingMessages = true;
     messagesBox.replaceChildren();
     showStatus(messagesBox, "Loading messages...");
-
-    const { data, error } = await db
-      .from("gx_direct_messages")
+    const { data, error } = await db.from("gx_direct_messages")
       .select("id,conversation_id,sender_id,content,created_at,read_at")
-      .eq("conversation_id", conversationId)
-      .order("created_at", { ascending: true })
-      .limit(200);
-
+      .eq("conversation_id", conversationId).order("created_at", { ascending: true }).limit(200);
     loadingMessages = false;
-
     if (error) {
       console.error("GX load messages:", error);
       showStatus(messagesBox, "Could not load messages.");
       return;
     }
-
     messagesBox.replaceChildren();
-
-    if (!data || data.length === 0) {
+    if (!data || !data.length) {
       showStatus(messagesBox, "No messages yet. Say hello!");
       return;
     }
-
-    data.forEach(function (message) {
+    data.forEach(message => {
       const bubble = document.createElement("div");
-      bubble.className = "gx-dm-bubble " +
-        (
-          message.sender_id === currentUser.id
-            ? "gx-dm-bubble-outgoing"
-            : "gx-dm-bubble-incoming"
-        );
-
+      bubble.className = "gx-dm-bubble " + (message.sender_id === currentUser.id
+        ? "gx-dm-bubble-outgoing" : "gx-dm-bubble-incoming");
       const content = document.createElement("p");
       content.textContent = message.content;
-
       const time = document.createElement("small");
-      time.textContent = new Date(message.created_at).toLocaleString(
-        undefined,
-        { hour: "2-digit", minute: "2-digit" }
-      );
-
+      time.textContent = new Date(message.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
       bubble.append(content, time);
       messagesBox.appendChild(bubble);
     });
-
     messagesBox.scrollTop = messagesBox.scrollHeight;
-
-    const unreadIds = data
-      .filter(message =>
-        message.sender_id !== currentUser.id && !message.read_at
-      )
+    const unreadIds = data.filter(message => message.sender_id !== currentUser.id && !message.read_at)
       .map(message => message.id);
-
     if (unreadIds.length) {
-      const { error: readError } = await db
-        .from("gx_direct_messages")
-        .update({ read_at: new Date().toISOString() })
-        .in("id", unreadIds);
-
-      if (readError) {
-        console.warn("GX mark messages read:", readError);
-      }
+      const { error: readError } = await db.from("gx_direct_messages")
+        .update({ read_at: new Date().toISOString() }).in("id", unreadIds);
+      if (readError) console.warn("GX mark messages read:", readError);
     }
   }
 
-  function resetChat() {
-    chatHeader.replaceChildren();
-    showStatus(chatHeader, "Select a conversation to start chatting.");
-    showStatus(messagesBox, "Your private conversations will appear here.");
-    messageInput.value = "";
-    messageInput.disabled = false;
-    sendButton.disabled = false;
-  }
-
-  composeForm.addEventListener("submit", async function (event) {
+  composeForm.addEventListener("submit", async event => {
     event.preventDefault();
-
-    if (!currentUser || !activeConversation) {
-      window.alert("Open a conversation first.");
+    if (!currentUser || !activeConversation) return;
+    const conversation = conversations.find(item => item.id === activeConversation);
+    if (!conversation || conversation.request_status !== "accepted") {
+      alert("This conversation must be accepted before you can reply.");
       return;
     }
-
-    const conversation = conversations.find(
-      item => item.id === activeConversation
-    );
-
-    if (!conversation || isIncomingRequest(conversation)) {
-      window.alert("Accept the message request before replying.");
-      return;
-    }
-
     const content = messageInput.value.trim();
-
     if (!content || content.length > 5000) return;
-
     sendButton.disabled = true;
-
-    const { error } = await db
-      .from("gx_direct_messages")
-      .insert({
-        conversation_id: activeConversation,
-        sender_id: currentUser.id,
-        content: content
-      });
-
+    const { error } = await db.from("gx_direct_messages").insert({
+      conversation_id: activeConversation, sender_id: currentUser.id, content
+    });
     sendButton.disabled = false;
-
     if (error) {
       console.error("GX send message:", error);
-      window.alert(error.message || "Message could not be sent.");
+      alert(error.message || "Message could not be sent.");
       return;
     }
-
     messageInput.value = "";
     await loadMessages(activeConversation);
   });
 
-  search.addEventListener("input", function () {
-    window.clearTimeout(searchTimer);
-
-    searchTimer = window.setTimeout(function () {
-      searchStudents(search.value).catch(function (error) {
-        console.error("GX student search failed:", error);
-      });
-    }, 350);
+  search.addEventListener("input", () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => searchStudents(search.value).catch(error => {
+      console.error("GX student search failed:", error);
+    }), 350);
   });
 
-  if (newChatButton) {
-    newChatButton.addEventListener("click", function () {
-      search.focus();
-      search.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-  }
+  backButton.addEventListener("click", () => {
+    showInbox();
+    loadConversations();
+  });
 
-  const messagesView = el("gxMessagesView");
-
-  if (messagesView && window.MutationObserver) {
-    let wasVisible = false;
-
-    const observer = new MutationObserver(function () {
-      const isVisible = !messagesView.hidden;
-
-      if (isVisible && !wasVisible && currentUser) {
+  let wasVisible = false;
+  if (window.MutationObserver) {
+    const observer = new MutationObserver(() => {
+      const visible = !view.hidden;
+      if (visible && !wasVisible && currentUser) {
+        showInbox();
         loadConversations();
       }
-
-      wasVisible = isVisible;
+      wasVisible = visible;
     });
-
-    observer.observe(messagesView, {
-      attributes: true,
-      attributeFilter: ["hidden"]
-    });
+    observer.observe(view, { attributes: true, attributeFilter: ["hidden", "class", "style"] });
   }
 
-  if (messagesView && !messagesView.hidden && currentUser) {
+  if (!currentUser) {
+    messageInput.disabled = true;
+    sendButton.disabled = true;
+  }
+  if (db.auth && typeof db.auth.onAuthStateChange === "function") {
+    db.auth.onAuthStateChange((_event, session) => {
+      if (session && session.user && !view.hidden) {
+        showInbox();
+        loadConversations();
+        wasVisible = true;
+      } else if (!session || !session.user) {
+        conversations = [];
+        conversationList.replaceChildren();
+        showInbox();
+      }
+    });
+  }
+  if (!view.hidden && currentUser) {
+    showInbox();
     loadConversations();
+    wasVisible = true;
   }
-
-  console.log("GRADE X DM interface connected.");
+  console.log("GRADE X DM interface connected to current messaging HTML.");
 })();
+
 /* ==========================================
    GRADE X — INSTAGRAM FOLLOW & STATS SYSTEM
 ========================================== */

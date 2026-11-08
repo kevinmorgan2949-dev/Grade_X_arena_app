@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0617">
+<meta name="description" content="GRADE X Arena - Student Social & Learning Hub">
+<link rel="stylesheet" href="style.css">
+<title>GRADE X Arena</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+:root {
+  color-scheme: dark;
+  --bg-dark: #0d0617;
+  --panel-bg: rgba(24, 12, 45, 0.92);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --accent-purple: #8a32ff;
+  --accent-blue: #2878ff;
+  --text-main: #ffffff;
+  --text-muted: #b4a2e0;
+  --gradient-brand: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+  --gradient-btn: linear-gradient(135deg, #7628e8, #2878ff);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+body {
+  background-color: var(--bg-dark);
+  background-image: radial-gradient(circle at 10% 20%, rgba(118, 40, 232, 0.15) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 80%, rgba(40, 120, 255, 0.12) 0%, transparent 40%);
+  background-attachment: fixed;
+  color: var(--text-main);
+  padding-bottom: calc(65px + env(safe-area-inset-bottom));
+}
+
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: none; background: none; }
+[hidden] { display: none !important; }
+
+/* INSTAGRAM TOP BAR */
+.ig-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 16px;
+  background: rgba(13, 6, 23, 0.95);
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(20px);
+}
+.ig-logo { display: flex; align-items: center; gap: 8px; }
+.ig-logo-icon { width: 32px; height: 32px; border-radius: 9px; background: var(--gradient-btn); display: grid; place-items: center; font-weight: 900; font-size: 18px; color: #fff; }
+.ig-logo span { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+.ig-logo span em { color: #a985ff; font-style: normal; }
+.ig-top-actions { display: flex; gap: 14px; align-items: center; }
+.ig-icon-btn { font-size: 22px; color: var(--text-main); width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,0.05); }
+
+/* CONTAINER */
+main { width: 100%; max-width: 470px; margin: 0 auto; }
+
+/* VIEWS */
+.ig-view { min-height: 80vh; }
+
+/* STORIES TRAY */
+.ig-stories {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  scrollbar-width: none;
+}
+.ig-stories::-webkit-scrollbar { display: none; }
+.ig-story-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 64px;
+  text-align: center;
+}
+.ig-story-ring {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  padding: 2.5px;
+  background: var(--gradient-brand);
+  position: relative;
+}
+.ig-story-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #251242;
+  border: 2px solid var(--bg-dark);
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  overflow: hidden;
+}
+.ig-story-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+/* AUTH SECTION STYLING */
+.auth-section { padding: 24px 16px; }
+.hero { text-align: center; margin-bottom: 24px; }
+.badge { display: inline-block; padding: 6px 12px; border-radius: 20px; background: rgba(138,50,255,0.15); color: #c9b4ff; font-size: 11px; font-weight: 700; margin-bottom: 10px; }
+.hero h2 { font-size: 28px; line-height: 1.2; }
+.hero h2 span { color: #a985ff; }
+.hero p { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+
+.auth-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+}
+.auth-card h2 { font-size: 20px; margin-bottom: 4px; }
+.auth-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+.auth-card label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.auth-card input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: #140727;
+  color: #fff;
+  margin-bottom: 14px;
+  outline: none;
+}
+.primary-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--gradient-btn);
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+}
+.text-btn {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #c9b4ff;
+  font-size: 13px;
+  margin-top: 14px;
+  cursor: pointer;
+}
+.status-message { font-size: 13px; margin-top: 10px; text-align: center; }
+
+/* POST CARD DESIGN */
+.ig-post, .gx-social-post-card {
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 12px;
+  background: var(--panel-bg);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.ig-post-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+}
+.ig-post-user { display: flex; align-items: center; gap: 10px; }
+.ig-user-avatar, .gx-avatar, .gx-social-avatar, .gx-social-comment-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #35195c;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.ig-user-avatar img, .gx-avatar img, .gx-social-avatar img, .gx-social-comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.ig-user-meta strong { font-size: 13px; display: block; }
+.ig-user-meta span { font-size: 11px; color: var(--text-muted); }
+
+.ig-post-media, .gx-social-post-media {
+  width: 100%;
+  max-height: 500px;
+  background: #000;
+  display: block;
+  object-fit: cover;
+}
+.ig-post-details, .gx-social-post-caption {
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.gx-social-post-actions {
+  display: flex;
+  gap: 16px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border-color);
+}
+.gx-social-post-actions button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+.gx-social-comments-area { padding: 0 14px 14px; }
+.gx-social-comments-list { display: grid; gap: 8px; margin-bottom: 10px; }
+.gx-social-comment { display: flex; gap: 8px; font-size: 12px; }
+.gx-social-comment-body { background: rgba(255,255,255,0.04); padding: 8px 10px; border-radius: 8px; flex: 1; }
+.gx-social-comment-meta { display: flex; justify-content: space-between; margin-bottom: 2px; color: var(--text-muted); font-size: 10px; }
+.gx-social-comment-form { display: flex; gap: 6px; margin-top: 6px; }
+.gx-social-comment-form input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: #15072b; color: #fff; font-size: 12px; }
+.gx-social-comment-form button { padding: 0 10px; border-radius: 6px; background: var(--accent-purple); color: #fff; font-size: 12px; font-weight: 700; }
+
+/* GENERAL PAGE WRAPPER STYLING */
+.ig-page-container { padding: 16px; }
+.ig-section-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.ig-section-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+.ig-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.ig-btn-primary {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--gradient-btn);
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  margin-top: 10px;
+}
+.ig-btn-secondary {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border-color);
+  color: #c9b4ff;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* 7-BUTTON INSTAGRAM BOTTOM NAVIGATION */
+.ig-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 58px;
+  background: rgba(13, 6, 23, 0.98);
+  border-top: 1px solid var(--border-color);
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  place-items: center;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.ig-nav-item {
+  font-size: 20px;
+  color: var(--text-muted);
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  transition: color 0.2s;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+.ig-nav-item.active { color: #fff; transform: scale(1.1); }
+
+/* PROFILE VIEW STYLING */
+.ig-profile-header { padding: 16px; }
+.ig-profile-info { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.ig-profile-pic {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: #35195c;
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  overflow: hidden;
+  border: 2px solid var(--accent-purple);
+}
+.ig-profile-pic img { width: 100%; height: 100%; object-fit: cover; }
+.ig-profile-stats { display: flex; flex: 1; justify-content: space-around; text-align: center; }
+.ig-profile-stats strong { font-size: 15px; display: block; }
+.ig-profile-stats span { font-size: 11px; color: var(--text-muted); }
+
+.ig-posts-grid, .gx-profile-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 12px;
+}
+.ig-grid-square, .gx-profile-post-item {
+  aspect-ratio: 1;
+  background: #1a0b30;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  overflow: hidden;
+}
+.ig-grid-square img, .ig-grid-square video, .gx-profile-post-item img, .gx-profile-post-item video { width: 100%; height: 100%; object-fit: cover; }
+
+/* MESSAGING STYLES */
+.gx-dm-list { display: grid; gap: 8px; margin-top: 10px; }
+.gx-dm-conversation {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-color);
+  text-align: left;
+}
+.gx-dm-conversation.active { background: rgba(138,50,255,0.15); border-color: var(--accent-purple); }
+.gx-dm-avatar { width: 40px; height: 40px; border-radius: 50%; background: #35195c; display: grid; place-items: center; overflow: hidden; font-size: 18px; flex-shrink: 0; }
+.gx-dm-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.gx-dm-student-details { flex: 1; min-width: 0; }
+.gx-dm-student-details strong { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-dm-student-details small { display: block; color: var(--text-muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-dm-bubble { max-width: 75%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; word-break: break-word; }
+.gx-dm-bubble-incoming { background: #211a37; align-self: flex-start; border-bottom-left-radius: 4px; }
+.gx-dm-bubble-outgoing { background: var(--accent-purple); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+.gx-dm-student-result { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; background: #15072b; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 6px; text-align: left; }
+
+/* SPLASH SCREEN */
+#gx-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-dark);
+  color: white;
+  transition: opacity 0.5s ease;
+}
+#gx-splash.hide { opacity: 0; pointer-events: none; }
+</style>
+</head>
+
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="gx-splash">
+  <div style="font-size: 26px; font-weight: 900; letter-spacing: 2px;">GRADE <span style="color:#a985ff">X</span></div>
+  <p style="font-size: 10px; letter-spacing: 3px; color: var(--text-muted); margin-top: 6px;">YOUR KNOWLEDGE. YOUR POWER.</p>
+</div>
+
+<!-- TOP HEADER -->
+<header class="ig-topbar">
+  <div class="ig-logo">
+    <div class="ig-logo-icon">X</div>
+    <span>GRADE <em>X</em></span>
+  </div>
+  <div class="ig-top-actions">
+    <button class="ig-icon-btn" aria-label="Notifications" onclick="alert('No new notifications.')">♡</button>
+    <button class="ig-icon-btn" id="gxDMButton" aria-label="Messages">✈️</button>
+  </div>
+</header>
+
+<main>
+  <!-- AUTHENTICATION SECTION -->
+  <section id="authSection" class="auth-section">
+    <div class="hero">
+      <span class="badge">WELCOME TO THE ARENA</span>
+      <h2>Your Classroom.<br><span>Your Rules.</span></h2>
+      <p>Read, learn, compete and grow with GRADE X.</p>
+    </div>
+    <div class="auth-card">
+      <h2 id="authTitle">Join GRADE X</h2>
+      <p id="authMessage">Create your student account to get started.</p>
+      <form id="authForm">
+        <label for="email">Email address</label>
+        <input id="email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+        
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" placeholder="Your password" minlength="6" autocomplete="current-password" required>
+        
+        <button id="authSubmit" type="submit" class="primary-btn">Create Account</button>
+      </form>
+      <p id="authStatus" class="status-message" role="status" aria-live="polite"></p>
+      <button id="authToggle" type="button" class="text-btn">Already have an account? Sign in</button>
+    </div>
+  </section>
+
+  <!-- APP CONTAINER (Shown when logged in) -->
+  <section id="appSection" hidden>
+
+    <!-- 1. HOME VIEW (Feed & Stories) -->
+    <section id="viewHome" class="ig-view">
+      <div class="ig-stories">
+        <div class="ig-story-item">
+          <div class="ig-story-ring">
+            <div class="ig-story-avatar" data-open-view="create">＋</div>
+          </div>
+          <span style="font-size: 11px; color: var(--text-muted);">Your status</span>
+        </div>
+        <div class="ig-story-item">
+          <div class="ig-story-ring"><div class="ig-story-avatar">🎓</div></div>
+          <span style="font-size: 11px; color: var(--text-muted);">Campus</span>
+        </div>
+        <div class="ig-story-item">
+          <div class="ig-story-ring"><div class="ig-story-avatar">📚</div></div>
+          <span style="font-size: 11px; color: var(--text-muted);">Study</span>
+        </div>
+        <div class="ig-story-item">
+          <div class="ig-story-ring"><div class="ig-story-avatar">🏆</div></div>
+          <span style="font-size: 11px; color: var(--text-muted);">Arena</span>
+        </div>
+      </div>
+
+      <!-- Quick Compose Action Bar -->
+      <div class="ig-card" style="display: flex; align-items: center; gap: 10px; margin: 12px 0;">
+        <div class="gx-avatar" id="gxFeedAvatar">👤</div>
+        <button type="button" data-open-view="create" style="flex: 1; text-align: left; color: var(--text-muted); font-size: 13px; background: transparent; border: none;">
+          Share something with your student community...
+        </button>
+        <button type="button" data-open-view="create" style="font-size: 22px; color: #a985ff;">＋</button>
+      </div>
+
+      <!-- Social Community Feed -->
+      <div id="gxHomeSocialFeed">
+        <div class="ig-card" style="text-align: center; padding: 30px;">
+          <p style="color: var(--text-muted);">Loading student community feed...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. LIBRARY VIEW -->
+    <section id="viewLibrary" class="ig-view" hidden>
+      <div class="ig-page-container">
+        <h2 class="ig-section-title">📚 GRADE X Library</h2>
+        <p class="ig-section-desc">Discover and share study materials.</p>
+        
+        <div class="ig-card">
+          <h3>📤 Upload PDF Material</h3>
+          <form id="uploadForm" style="display: grid; gap: 10px; margin-top: 10px;">
+            <input id="pdfTitle" type="text" placeholder="Document title (e.g. Physics Note)" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#15072b; color:#fff;">
+            <select id="pdfSubject" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#15072b; color:#fff;">
+              <option value="">Choose subject</option>
+              <option>Mathematics</option><option>Physics</option><option>Chemistry</option><option>Biology</option><option>Petroleum Engineering</option><option>Other</option>
+            </select>
+            <textarea id="pdfDescription" placeholder="Description..." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#15072b; color:#fff; min-height:60px;"></textarea>
+            <input id="pdfFile" type="file" accept="application/pdf,.pdf" required style="font-size:12px;">
+            <button id="uploadBtn" type="submit" class="ig-btn-primary">Upload to Library</button>
+          </form>
+          <p id="uploadStatus" class="status-message" role="status" aria-live="polite"></p>
+        </div>
+
+        <div class="ig-card">
+          <h3>Explore Materials</h3>
+          <input id="searchPDF" type="search" placeholder="Search documents or subjects..." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#15072b; margin-top:8px; color:#fff;">
+          <div id="pdfList" style="margin-top: 12px;">
+            <p style="color: var(--text-muted); text-align: center; padding: 20px;">Loading library documents...</p>
+          </div>
+        </div>
+
+        <div id="pdfReader" class="ig-card" hidden>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 id="readerTitle">Reader</h3>
+            <button id="closeReader" class="ig-btn-secondary" style="width:auto; padding:4px 10px;">Close</button>
+          </div>
+          <div id="readerPages"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. GRADE BOT VIEW -->
+    <section id="viewBot" class="ig-view" hidden>
+      <div class="ig-page-container">
+        <div style="text-align: center; margin-bottom: 14px;">
+          <div style="font-size: 36px;">🤖</div>
+          <h2 class="ig-section-title">Grade Bot AI</h2>
+          <p class="ig-section-desc">Your personal academic study assistant.</p>
+        </div>
+
+        <div class="ig-card">
+          <div style="margin-bottom: 12px;">
+            <label for="botPDF" style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">📚 Study from a PDF</label>
+            <select id="botPDF" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#15072b; color:#fff;">
+              <option value="">General questions (no PDF selected)</option>
+            </select>
+            <p id="botPDFStatus" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Select a document to study from it.</p>
+          </div>
+
+          <div id="chatMessages" style="min-height: 180px; max-height: 320px; overflow-y: auto; background: #0c051a; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px;">
+            <div style="background: #211a37; padding: 10px; border-radius: 8px; font-size: 13px;">Hey student! 👋 I'm Grade Bot. Select a PDF from your Library, then ask me questions about it!</div>
+          </div>
+
+          <form id="chatForm" style="display: flex; gap: 8px;">
+            <input id="chatInput" type="text" placeholder="Ask Grade Bot..." autocomplete="off" required style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#15072b; color:#fff;">
+            <button type="submit" class="ig-btn-primary" style="width: auto; margin:0; padding: 10px 16px;">➤</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. ARENA VIEW -->
+    <section id="viewArena" class="ig-view" hidden>
+      <div class="ig-page-container">
+        <h2 class="ig-section-title">🎮 GRADE X Arena</h2>
+        <p class="ig-section-desc">Challenge yourself and rise higher.</p>
+        
+        <div class="ig-card" id="arenaGameHub">
+          <h3>🧠 Knowledge Quiz</h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin: 6px 0 12px;">Test your knowledge and compete on the leaderboard.</p>
+          <button id="startQuiz" class="ig-btn-primary">Play Quiz Challenge</button>
+        </div>
+
+        <div class="ig-card" id="quizArea" hidden>
+          <p id="quizProgress" style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;"></p>
+          <h3 id="quizQuestion" style="font-size: 16px; margin-bottom: 12px;"></h3>
+          <div id="quizOptions" style="display: grid; gap: 8px; margin-bottom: 12px;"></div>
+          <p id="quizFeedback" style="font-size: 13px; margin-bottom: 8px;"></p>
+          <button id="nextQuestion" class="ig-btn-primary" hidden>Next Question</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. STORE VIEW -->
+    <section id="viewStore" class="ig-view" hidden>
+      <div class="ig-page-container">
+        <h2 class="ig-section-title">🛍️ GRADE X Store</h2>
+        <p class="ig-section-desc">Your student market for resources and rewards.</p>
+        
+        <div class="ig-card">
+          <h3>📚 Library Market</h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin: 6px 0;">Browse premier academic guides and student notes.</p>
+          <button class="ig-btn-secondary" onclick="switchTab('library')">Open Library</button>
+        </div>
+
+        <div class="ig-card">
+          <h3>🎁 Rewards Store</h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin: 6px 0;">Unlock exclusive perks earned through verified Arena performance.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. WALLET VIEW -->
+    <section id="viewWallet" class="ig-view" hidden>
+      <div class="ig-page-container">
+        <h2 class="ig-section-title">🪙 GRADE COINS</h2>
+        <p class="ig-section-desc">Your in-app rewards and coin balance.</p>
+        
+        <div class="ig-card" style="background: linear-gradient(135deg, rgba(118,40,232,0.35), rgba(40,120,255,0.25)); text-align: center; padding: 24px;">
+          <p style="font-size: 11px; letter-spacing: 1px; color: var(--text-muted);">TOTAL BALANCE</p>
+          <h2 style="font-size: 32px; margin: 6px 0; color: #c9b4ff;">0 GX</h2>
+          <span style="font-size: 11px; color: var(--text-muted);">Secure wallet sync active</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. PROFILE VIEW -->
+    <section id="viewProfile" class="ig-view" hidden>
+      <div class="ig-profile-header">
+        <div class="ig-profile-info">
+          <div class="ig-profile-pic">
+            <img id="gxProfilePreviewImage" src="" alt="" hidden>
+            <span id="gxProfilePreviewFallback">👤</span>
+          </div>
+          <div class="ig-profile-stats">
+            <div><strong id="gxProfilePostCount">0</strong><span>Posts</span></div>
+            <div><strong id="gxProfileFollowerCount">0</strong><span>Followers</span></div>
+            <div><strong id="gxProfileFollowingCount">0</strong><span>Following</span></div>
+          </div>
+        </div>
+        <div style="margin-top: 12px;">
+          <strong id="gxSocialProfileName" style="font-size: 15px;">GRADE X Student</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="gxSocialProfileBio">🎓 Learning • Knowledge • Growth</p>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <button class="ig-btn-secondary" onclick="switchTab('profileSettings')" style="margin:0;">Edit profile</button>
+        </div>
+      </div>
+
+      <div class="ig-page-container" style="padding-top: 0;">
+        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">My Posts</h3>
+        <div class="gx-profile-posts-grid" id="gxProfilePostsGrid">
+          <div class="ig-grid-square"><p style="font-size:11px; color:var(--text-muted)">No posts</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFILE SETTINGS PAGE -->
+    <section id="profilePage" class="ig-view" hidden>
+      <div class="ig-page-container">
+        <h2 class="ig-section-title">👤 Account Settings</h2>
+        <p class="ig-section-desc">Manage your student credentials.</p>
+        
+        <div class="ig-card">
+          <div style="text-align: center; margin-bottom: 12px;">
+            <label for="profilePictureInput" style="cursor: pointer; color: #a985ff; font-size: 12px; font-weight: 600;">📷 Change Profile Picture</label>
+            <input type="file" id="profilePictureInput" accept="image/*" hidden>
+          </div>
+
+          <label style="font-size:12px; margin-bottom:4px; display:block;">Display Name</label>
+          <input type="text" id="profileNameInput" placeholder="Your name" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#15072b; color:#fff; margin-bottom:10px;">
+          
+          <label style="font-size:12px; margin-bottom:4px; display:block;">Username</label>
+          <input type="text" id="profileUsernameInput" placeholder="Username" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#15072b; color:#fff; margin-bottom:10px;">
+          
+          <label style="font-size:12px; margin-bottom:4px; display:block;">Bio</label>
+          <textarea id="profileBioInput" placeholder="Bio..." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#15072b; color:#fff; margin-bottom:12px; min-height:60px;"></textarea>
+          
+          <button id="saveProfileBtn" class="ig-btn-primary">Save Changes</button>
+          <p id="profileStatus" class="status-message"></p>
+        </div>
+
+        <button id="signOutBtn" class="ig-btn-secondary" style="border-color: rgba(251,113,133,0.3); color: #fb7185; background: rgba(251,113,133,0.05); margin-top: 20px;">Sign Out</button>
+      </div>
+    </section>
+
+    <!-- MESSAGES VIEW (Instagram style) -->
+    <section id="viewMessages" class="ig-view" hidden>
+      <div id="igInbox" class="ig-screen" style="display:flex; flex-direction:column; min-height:80vh;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border-color);">
+          <button onclick="switchTab('home')" style="font-size: 18px; color:#fff;">←</button>
+          <h2 style="font-size: 16px; font-weight: 700; margin:0;">Messages</h2>
+          <span></span>
+        </div>
+
+        <div style="padding: 12px 16px;">
+          <input type="search" id="gxDMSearch" placeholder="Search students..." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#15072b; color:#fff;">
+        </div>
+
+        <div id="gxDMStudentResults" style="padding: 0 16px;" hidden></div>
+
+        <div id="gxDMConversationList" style="flex:1; overflow-y:auto; padding: 0 16px;">
+          <p style="text-align: center; color: var(--text-muted); padding: 30px;">Loading conversations...</p>
+        </div>
+      </div>
+
+      <!-- Individual Chat Screen -->
+      <div id="igChatScreen" class="ig-screen" hidden style="display:flex; flex-direction:column; height:80vh;">
+        <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); background: var(--panel-bg);">
+          <button id="igChatBackBtn" style="font-size: 18px; color:#fff;">←</button>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div id="igChatAvatar" style="width:32px; height:32px; border-radius:50%; background:#35195c; display:grid; place-items:center; font-size:14px;">👤</div>
+            <div>
+              <strong id="igChatName" style="font-size:13px; display:block;">Student</strong>
+              <span style="font-size:10px; color:var(--text-muted);">GRADE X</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="gxDMMessages" style="flex:1; overflow-y:auto; padding: 16px; display:flex; flex-direction:column; gap:8px;">
+          <p style="text-align:center; color:var(--text-muted);">Select a conversation to start chatting.</p>
+        </div>
+
+        <form id="gxDMComposeForm" style="display:flex; padding: 10px 16px; border-top:1px solid var(--border-color); background:var(--panel-bg); gap:8px;">
+          <input type="text" id="gxDMMessageInput" placeholder="Message..." required style="flex:1; padding:10px; border-radius:20px; border:1px solid var(--border-color); background:#15072b; color:#fff;">
+          <button type="submit" style="color:#3797f0; font-weight:700; padding:0 10px;">Send</button>
+        </form>
+      </div>
+    </section>
+
+  </section>
+</main>
+
+
+<nav class="ig-bottom-nav">
+  <button class="ig-nav-item active" onclick="switchTab('home')" aria-label="Home">
+    <svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
+    <span>Home</span>
+  </button>
+
+  <button class="ig-nav-item" onclick="switchTab('library')" aria-label="Library">
+    <svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 4.5v17M8 6h8M8 10h8"/></svg>
+    <span>Library</span>
+  </button>
+
+  <button class="ig-nav-item" onclick="switchTab('bot')" aria-label="Grade Bot">
+    <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="4"/><path d="M12 2v4M8 12h.01M16 12h.01M9 16h6M2 12h1M21 12h1"/></svg>
+    <span>Bot</span>
+  </button>
+
+  <button class="ig-nav-item" onclick="switchTab('arena')" aria-label="Arena">
+    <svg viewBox="0 0 24 24"><path d="M6 9H4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h2l3-3h6l3 3h2a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-2z"/><path d="M7 11v4M5 13h4M16 12h.01M18 14h.01"/></svg>
+    <span>Arena</span>
+  </button>
+
+  <button class="ig-nav-item" onclick="switchTab('store')" aria-label="Store">
+    <svg viewBox="0 0 24 24"><path d="M3 9h18l-2 12H5z"/><path d="M3 9l2-6h14l2 6M9 9a3 3 0 0 0 6 0"/></svg>
+    <span>Store</span>
+  </button>
+
+  <button class="ig-nav-item" onclick="switchTab('wallet')" aria-label="Wallet">
+    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="15" rx="3"/><path d="M2 9h20M16 14h.01M6 5V3h12v2"/></svg>
+    <span>Wallet</span>
+  </button>
+
+  <button class="ig-nav-item" onclick="switchTab('profile')" aria-label="Profile">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+    <span>Profile</span>
+  </button>
+</nav>
+
+
+<!-- CREATE POST MODAL -->
+<div id="gxCreatePostModal" class="ig-card" hidden style="position:fixed; inset:20px; z-index:10000; background:#120724; border:1px solid var(--accent-purple); overflow-y:auto;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+    <h3>Create Post</h3>
+    <button type="button" data-close-create-post style="font-size:20px; color:#fff;">✕</button>
+  </div>
+  <form id="gxSocialPostForm" style="display:grid; gap:10px;">
+    <label style="font-size:12px;">Choose photo or video</label>
+    <input type="file" id="gxPostMedia" accept="image/*,video/*" required style="font-size:12px;">
+    <div id="gxPostMediaPreview" hidden style="margin-top:8px;"></div>
+    <label style="font-size:12px;">Caption</label>
+    <textarea id="gxPostCaption" placeholder="Write a caption..." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:#15072b; color:#fff; min-height:80px;"></textarea>
+    <button type="submit" id="gxPublishPostBtn" class="ig-btn-primary">Share Post</button>
+    <p id="gxPostStatus" class="status-message"></p>
+  </form>
+</div>
+
+<!-- PUBLIC STUDENT PROFILE VIEW MODAL -->
+<section id="publicStudentProfilePage" class="ig-view" hidden style="position:fixed; inset:0; z-index:9000; background:var(--bg-dark); overflow-y:auto;">
+  <div class="ig-page-container">
+    <button type="button" id="closePublicStudentProfileBtn" class="ig-btn-secondary" style="width:auto; margin-bottom:12px;">← Back</button>
+    <div class="ig-profile-header">
+      <div class="ig-profile-info">
+        <div class="ig-profile-pic">
+          <img id="publicStudentAvatar" src="" alt="" hidden>
+          <span id="publicStudentAvatarFallback">👤</span>
+        </div>
+        <div class="ig-profile-stats">
+          <div><strong id="publicStudentFollowerCount">0</strong><span>Followers</span></div>
+          <div><strong id="publicStudentFollowingCount">0</strong><span>Following</span></div>
+        </div>
+      </div>
+      <div style="margin-top: 12px;">
+        <strong id="publicStudentName" style="font-size: 16px;">GRADE X Student</strong>
+        <p id="publicStudentJoined" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;"></p>
+      </div>
+      <div style="margin-top: 12px;" id="publicStudentFollowContainer">
+        <button type="button" id="publicStudentFollowBtn" class="ig-btn-primary">Follow</button>
+      </div>
+    </div>
+    <div class="ig-card">
+      <h3>📚 Published Study Materials</h3>
+      <div id="publicStudentPDFs" style="margin-top: 10px;"><p style="color:var(--text-muted)">Loading study materials...</p></div>
+    </div>
+    <p id="publicStudentProfileStatus" class="status-message"></p>
+  </div>
+</section>
+
+<script>
+  function switchTab(tabName) {
+    document.querySelectorAll(".ig-nav-item").forEach(btn => btn.classList.remove("active"));
+    
+    const views = {
+      home: "viewHome",
+      library: "viewLibrary",
+      bot: "viewBot",
+      arena: "viewArena",
+      store: "viewStore",
+      wallet: "viewWallet",
+      profile: "viewProfile",
+      messages: "viewMessages",
+      profileSettings: "profilePage"
+    };
+
+    Object.values(views).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.hidden = true;
+    });
+
+    const targetId = views[tabName];
+    if (targetId) {
+      document.getElementById(targetId).hidden = false;
+    }
+
+    const navButtons = document.querySelectorAll(".ig-bottom-nav .ig-nav-item");
+    const tabKeys = ["home", "library", "bot", "arena", "store", "wallet", "profile"];
+    const index = tabKeys.indexOf(tabName);
+    if (index !== -1 && navButtons[index]) {
+      navButtons[index].classList.add("active");
+    }
+
+    window.scrollTo(0, 0);
+  }
+
+  // Modal handlers
+  document.querySelectorAll('[data-open-view="create"]').forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const modal = document.getElementById("gxCreatePostModal");
+      if (modal) modal.hidden = false;
+    });
+  });
+
+  document.querySelectorAll("[data-close-create-post]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const modal = document.getElementById("gxCreatePostModal");
+      if (modal) modal.hidden = true;
+    });
+  });
+
+  document.getElementById("gxDMButton")?.addEventListener("click", () => {
+    switchTab("messages");
+  });
+
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      const splash = document.getElementById("gx-splash");
+      if (splash) splash.classList.add("hide");
+    }, 900);
+  });
+</script>
+
+<script src="app.js"></script>
+</body>
+</html>
