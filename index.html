@@ -357,6 +357,64 @@ main { width: 100%; max-width: 470px; margin: 0 auto; }
   transition: opacity 0.5s ease;
 }
 #gx-splash.hide { opacity: 0; pointer-events: none; }
+
+/* =========================================
+   GRADE X MILLIONAIRE — QUESTION STAGE
+========================================= */
+.gxm-shell{max-width:980px;margin:0 auto;padding:8px 0 24px;color:#f7f8ff}
+.gxm-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.gxm-brand{display:flex;align-items:center;gap:10px}
+.gxm-mark{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#f7d77b,#a96a18);color:#15152b;font-weight:1000;font-size:23px;box-shadow:0 0 24px #d9a83d55}
+.gxm-brand strong{display:block;font-size:16px;letter-spacing:1.4px}
+.gxm-brand small{display:block;color:#a9b9e8;font-size:9px;letter-spacing:2px;margin-top:3px}
+.gxm-exit{border:1px solid #536a9c;border-radius:10px;padding:9px 12px;color:#dce7ff;background:#101d3a;font-size:12px}
+.gxm-intro{position:relative;overflow:hidden;border:1px solid #4e659a;border-radius:18px;padding:20px;background:radial-gradient(ellipse at 50% -30%,#355d9e 0%,#172b55 48%,#0b1530 100%);box-shadow:0 15px 38px #0007;margin-bottom:14px}
+.gxm-intro:after{content:"";position:absolute;width:210px;height:210px;border:1px solid #e4bd6540;border-radius:50%;right:-85px;top:-110px;box-shadow:0 0 0 18px #e4bd6510,0 0 0 38px #e4bd6508;pointer-events:none}
+.gxm-kicker{color:#f0ca72;font-size:10px;letter-spacing:2.6px;font-weight:800}
+.gxm-intro h2{font-size:clamp(24px,6vw,36px);line-height:1.1;margin:9px 0 7px;letter-spacing:.5px}
+.gxm-intro p{font-size:12px;line-height:1.6;color:#c1d0ee;max-width:520px}
+.gxm-start-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:17px}
+.gxm-start{border:1px solid #ffe5a0;border-radius:11px;padding:12px 19px;background:linear-gradient(135deg,#f6d985,#c28a32);color:#17172b;font-weight:900;letter-spacing:.5px;box-shadow:0 5px 18px #d9a83d40}
+.gxm-note{font-size:10px;color:#aabce2}
+.gxm-game{display:grid;grid-template-columns:minmax(0,1fr) 205px;gap:13px;align-items:start}
+.gxm-main{min-width:0}
+.gxm-statusbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.gxm-pill{border:1px solid #435b8b;background:#111f3d;color:#d8e4ff;border-radius:99px;padding:7px 10px;font-size:10px;letter-spacing:1px;font-weight:800}
+.gxm-prize-now{color:#f4d17c;font-weight:900;font-size:12px;text-align:right}
+.gxm-question-card{position:relative;border:1px solid #7894c8;border-radius:17px;padding:20px 17px 18px;background:linear-gradient(155deg,#1c3b70 0%,#12274e 55%,#101c3c 100%);box-shadow:inset 0 1px #ffffff18,0 12px 30px #0006;min-height:190px;display:flex;flex-direction:column;justify-content:center}
+.gxm-question-card:before{content:"";position:absolute;inset:7px;border:1px solid #d9b75c45;border-radius:11px;pointer-events:none}
+.gxm-q-label{position:relative;color:#f1cc76;font-size:10px;font-weight:900;letter-spacing:2px;margin-bottom:13px}
+.gxm-question{position:relative;font-size:clamp(17px,4.4vw,23px);font-weight:750;line-height:1.45;text-align:center;color:#fff;text-wrap:balance}
+.gxm-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}
+.gxm-option{display:flex;align-items:center;gap:10px;text-align:left;min-height:58px;padding:10px 12px;border:1px solid #526c9f;border-radius:12px;background:linear-gradient(110deg,#172b50,#111e3a);color:#f3f6ff;font-size:13px;line-height:1.35;transition:transform .16s,border-color .16s,background .16s}
+.gxm-option:active{transform:scale(.985)}
+.gxm-option:disabled{opacity:1}
+.gxm-option .gxm-letter{flex:0 0 27px;height:27px;display:grid;place-items:center;border-radius:50%;border:1px solid #d7b65f;color:#f3d27c;font-weight:900;font-size:11px}
+.gxm-option.selected{border-color:#f1cf78;background:linear-gradient(110deg,#604b28,#263b60);box-shadow:0 0 0 1px #f1cf7840,0 0 18px #e0b85a25}
+.gxm-option.correct{border-color:#52d69a;background:#124b3c}
+.gxm-option.wrong{border-color:#ff6b78;background:#552432}
+.gxm-controls{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px}
+.gxm-lifelines{display:flex;gap:7px;flex-wrap:wrap}
+.gxm-life{border:1px solid #6279a7;border-radius:9px;padding:9px 10px;background:#111f3b;color:#e3eaff;font-size:10px;font-weight:800}
+.gxm-life:disabled{opacity:.4}
+.gxm-confirm{border:1px solid #ffe5a0;border-radius:9px;padding:10px 15px;background:linear-gradient(135deg,#f5d987,#c58c37);color:#19192a;font-size:11px;font-weight:900}
+.gxm-feedback{min-height:20px;margin-top:10px;text-align:center;font-size:11px;color:#d5e1fa}
+.gxm-ladder{border:1px solid #405985;border-radius:15px;padding:12px;background:linear-gradient(180deg,#172b50,#0e1932);box-shadow:0 10px 25px #0005}
+.gxm-ladder h3{font-size:11px;letter-spacing:1.5px;color:#f0cf7a;margin:2px 0 10px;text-align:center}
+.gxm-ladder ol{list-style:none;display:flex;flex-direction:column-reverse;gap:4px}
+.gxm-ladder li{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:7px;color:#b8c8e8;font-size:10px}
+.gxm-ladder li span:first-child{color:#d9b85e;font-weight:900;width:23px}
+.gxm-ladder li.safe{color:#f4d98d;background:#493b25}
+.gxm-ladder li.current{background:linear-gradient(90deg,#8b682c,#d1a84d);color:#17172a;font-weight:900;box-shadow:0 0 13px #d7b65c55}
+.gxm-ladder li.current span:first-child{color:#17172a}
+.gxm-ladder li.passed{color:#83e4bb}
+.gxm-ladder-foot{font-size:9px;color:#93a9d1;text-align:center;margin-top:10px;line-height:1.5}
+.gxm-loading{display:flex;align-items:center;justify-content:center;gap:9px;padding:35px 12px;color:#dce8ff;font-size:12px}
+.gxm-spinner{width:17px;height:17px;border:2px solid #6d83ae;border-top-color:#f1cf78;border-radius:50%;animation:gxmspin .8s linear infinite}
+@keyframes gxmspin{to{transform:rotate(360deg)}}
+@media(max-width:650px){.gxm-game{grid-template-columns:1fr}.gxm-ladder{order:2}.gxm-ladder ol{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.gxm-ladder li{padding:6px 5px}.gxm-ladder li span:last-child{font-size:9px}.gxm-options{grid-template-columns:1fr}.gxm-question-card{min-height:155px}.gxm-controls{align-items:stretch;flex-direction:column}.gxm-confirm{width:100%}.gxm-intro{padding:17px}}
+@media(prefers-reduced-motion:reduce){.gxm-spinner{animation:none}.gxm-option{transition:none}}
+
 </style>
 </head>
 
@@ -519,22 +577,53 @@ main { width: 100%; max-width: 470px; margin: 0 auto; }
 
     <!-- 4. ARENA VIEW -->
     <section id="viewArena" class="ig-view" hidden>
-      <div class="ig-page-container">
-        <h2 class="ig-section-title">🎮 GRADE X Arena</h2>
-        <p class="ig-section-desc">Challenge yourself and rise higher.</p>
-        
-        <div class="ig-card" id="arenaGameHub">
-          <h3>🧠 Knowledge Quiz</h3>
-          <p style="font-size: 12px; color: var(--text-muted); margin: 6px 0 12px;">Test your knowledge and compete on the leaderboard.</p>
-          <button id="startQuiz" class="ig-btn-primary">Play Quiz Challenge</button>
+      <div class="ig-page-container gxm-shell">
+        <div class="gxm-heading">
+          <div class="gxm-brand">
+            <div class="gxm-mark">X</div>
+            <div><strong>GRADE X</strong><small>THE MILLIONAIRE CHALLENGE</small></div>
+          </div>
+          <button type="button" class="gxm-exit" id="gxmExit">Exit Arena</button>
         </div>
 
-        <div class="ig-card" id="quizArea" hidden>
-          <p id="quizProgress" style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;"></p>
-          <h3 id="quizQuestion" style="font-size: 16px; margin-bottom: 12px;"></h3>
-          <div id="quizOptions" style="display: grid; gap: 8px; margin-bottom: 12px;"></div>
-          <p id="quizFeedback" style="font-size: 13px; margin-bottom: 8px;"></p>
-          <button id="nextQuestion" class="ig-btn-primary" hidden>Next Question</button>
+        <div class="gxm-intro" id="gxmIntro">
+          <div class="gxm-kicker">15 QUESTIONS · ONE GRAND CHALLENGE</div>
+          <h2>ARE YOU READY<br>TO GO ALL THE WAY?</h2>
+          <p>Take on fifteen questions, climb the prize ladder and protect your progress at the safe checkpoints. Every answer matters.</p>
+          <div class="gxm-start-row">
+            <button type="button" class="gxm-start" id="startQuiz">START CHALLENGE</button>
+            <span class="gxm-note">Powered by GRADE BOT AI</span>
+          </div>
+        </div>
+
+        <div id="quizArea" hidden>
+          <div class="gxm-statusbar">
+            <span class="gxm-pill" id="quizProgress">QUESTION 01 / 15</span>
+            <span class="gxm-prize-now" id="gxmPrizeNow">LEVEL 01</span>
+          </div>
+          <div class="gxm-game">
+            <div class="gxm-main">
+              <div class="gxm-question-card">
+                <div class="gxm-q-label">YOUR QUESTION</div>
+                <h3 class="gxm-question" id="quizQuestion">Your question will appear here.</h3>
+              </div>
+              <div class="gxm-options" id="quizOptions"></div>
+              <div class="gxm-controls">
+                <div class="gxm-lifelines">
+                  <button type="button" class="gxm-life" id="gxm5050" disabled>50:50</button>
+                  <button type="button" class="gxm-life" id="gxmAudience" disabled>ASK AUDIENCE</button>
+                  <button type="button" class="gxm-life" id="gxmBot" disabled>ASK GRADE BOT</button>
+                </div>
+                <button type="button" class="gxm-confirm" id="nextQuestion" hidden>LOCK ANSWER</button>
+              </div>
+              <p class="gxm-feedback" id="quizFeedback" role="status" aria-live="polite"></p>
+            </div>
+            <aside class="gxm-ladder">
+              <h3>THE PRIZE LADDER</h3>
+              <ol id="gxmPrizeLadder"></ol>
+              <p class="gxm-ladder-foot">SAFE CHECKPOINTS<br>Questions 5 · 10 · 15</p>
+            </aside>
+          </div>
         </div>
       </div>
     </section>

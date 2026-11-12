@@ -1118,207 +1118,185 @@ if (chatForm && chatInput && chatMessages) {
 }
 
 // ============================================
-// 14. ARENA — FREE PRACTICE QUIZ
+// 14. GRADE X — MILLIONAIRE MODE
 // ============================================
 
-const quizQuestions = [
-    {
-        question: "What is the chemical symbol for water?",
-        options: ["CO2", "H2O", "O2", "NaCl"],
-        answer: 1
-    },
-    {
-        question: "Which planet is known as the Red Planet?",
-        options: ["Venus", "Jupiter", "Mars", "Saturn"],
-        answer: 2
-    },
-    {
-        question: "What is 12 × 8?",
-        options: ["86", "96", "108", "92"],
-        answer: 1
-    },
-    {
-        question: "Which gas do plants absorb during photosynthesis?",
-        options: ["Oxygen", "Nitrogen", "Hydrogen", "Carbon dioxide"],
-        answer: 3
-    },
-    {
-        question: "What is the SI unit of force?",
-        options: ["Joule", "Newton", "Watt", "Pascal"],
-        answer: 1
-    },
-    {
-        question: "How many sides does a hexagon have?",
-        options: ["Five", "Seven", "Six", "Eight"],
-        answer: 2
-    },
-    {
-        question: "What is the largest ocean on Earth?",
-        options: [
-            "Atlantic Ocean",
-            "Indian Ocean",
-            "Arctic Ocean",
-            "Pacific Ocean"
-        ],
-        answer: 3
-    },
-    {
-        question: "Which organ pumps blood around the human body?",
-        options: ["Liver", "Heart", "Lungs", "Kidneys"],
-        answer: 1
-    },
-    {
-        question: "What is the approximate speed of light in a vacuum?",
-        options: [
-            "300,000 km/s",
-            "30,000 km/s",
-            "3,000 km/s",
-            "150,000 km/s"
-        ],
-        answer: 0
-    },
-    {
-        question: "What is the main natural source of energy for Earth?",
-        options: ["The Moon", "The Sun", "Wind", "Coal"],
-        answer: 1
+(function initGXMillionaire() {
+    const startButton = getElement("startQuiz");
+    const quizArea = getElement("quizArea");
+    const intro = getElement("gxmIntro");
+    const questionText = getElement("quizQuestion");
+    const optionsBox = getElement("quizOptions");
+    const progress = getElement("quizProgress");
+    const feedback = getElement("quizFeedback");
+    const nextButton = getElement("nextQuestion");
+    const ladder = getElement("gxmPrizeLadder");
+    const prizeNow = getElement("gxmPrizeNow");
+    const exitButton = getElement("gxmExit");
+
+    if (!startButton || !quizArea || !optionsBox || !questionText) return;
+
+    const MATH_SUBJECT_ID = "c317036d-3d79-4d5c-a7f2-49dd0f100d0f";
+    const totalQuestions = 15;
+    const levels = [
+        "LEVEL 01", "LEVEL 02", "LEVEL 03", "LEVEL 04", "SAFE 05",
+        "LEVEL 06", "LEVEL 07", "LEVEL 08", "LEVEL 09", "SAFE 10",
+        "LEVEL 11", "LEVEL 12", "LEVEL 13", "LEVEL 14", "GRAND 15"
+    ];
+
+    let questionNumber = 0;
+    let selectedOption = null;
+    let currentQuestionId = null;
+    let loading = false;
+
+    function renderLadder() {
+        if (!ladder) return;
+        ladder.innerHTML = "";
+        levels.forEach(function (label, index) {
+            const li = document.createElement("li");
+            if (index === 4 || index === 9 || index === 14) li.classList.add("safe");
+            if (index < questionNumber) li.classList.add("passed");
+            if (index === questionNumber) li.classList.add("current");
+            const number = document.createElement("span");
+            number.textContent = String(index + 1).padStart(2, "0");
+            const name = document.createElement("span");
+            name.textContent = label;
+            li.append(number, name);
+            ladder.appendChild(li);
+        });
+        if (prizeNow) prizeNow.textContent = "LEVEL " + String(Math.min(questionNumber + 1, 15)).padStart(2, "0");
     }
-];
 
-let quizIndex = 0;
-let quizScore = 0;
-let quizAnswered = false;
+    function showLoading(message) {
+        optionsBox.innerHTML = '<div class="gxm-loading"><span class="gxm-spinner"></span><span></span></div>';
+        const text = optionsBox.querySelector(".gxm-loading span:last-child");
+        if (text) text.textContent = message || "GRADE BOT is preparing your question...";
+        nextButton.hidden = true;
+    }
 
-const startQuiz = getElement("startQuiz");
-const quizArea = getElement("quizArea");
-const quizProgress = getElement("quizProgress");
-const quizQuestion = getElement("quizQuestion");
-const quizOptions = getElement("quizOptions");
-const quizFeedback = getElement("quizFeedback");
-const nextQuestion = getElement("nextQuestion");
-
-if (startQuiz) {
-    startQuiz.addEventListener("click", function () {
-        quizIndex = 0;
-        quizScore = 0;
-        quizAnswered = false;
-
-        if (quizArea) quizArea.hidden = false;
-
-        startQuiz.hidden = true;
-        startQuiz.textContent = "Start Quiz";
-
-        showQuizQuestion();
-
-        if (quizArea) {
-            quizArea.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
+    function showQuestion(question) {
+        const text = question.question_text || question.question || question.text;
+        const options = Array.isArray(question.options) ? question.options : [];
+        if (!text || options.length !== 4) {
+            throw new Error("GRADE BOT returned an incomplete question. Please try again.");
         }
-    });
-}
 
-function showQuizQuestion() {
-    quizAnswered = false;
+        currentQuestionId = question.id || question.question_id || null;
+        selectedOption = null;
+        questionText.textContent = text;
+        progress.textContent = "QUESTION " + String(questionNumber + 1).padStart(2, "0") + " / 15";
+        feedback.textContent = "Choose the answer you believe is correct.";
+        optionsBox.innerHTML = "";
 
-    const question = quizQuestions[quizIndex];
-
-    quizProgress.textContent =
-        "QUESTION " + (quizIndex + 1) +
-        " OF " + quizQuestions.length;
-
-    quizQuestion.textContent = question.question;
-    quizOptions.innerHTML = "";
-    quizFeedback.textContent = "";
-    nextQuestion.hidden = true;
-
-    question.options.forEach(function (option, index) {
-        const button = document.createElement("button");
-
-        button.className = "quiz-option";
-        button.textContent = option;
-
-        button.addEventListener("click", function () {
-            answerQuizQuestion(index);
+        options.forEach(function (option, index) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "gxm-option";
+            const letter = document.createElement("span");
+            letter.className = "gxm-letter";
+            letter.textContent = ["A", "B", "C", "D"][index];
+            const answer = document.createElement("span");
+            answer.textContent = String(option);
+            button.append(letter, answer);
+            button.addEventListener("click", function () {
+                selectedOption = index;
+                optionsBox.querySelectorAll(".gxm-option").forEach(function (item) {
+                    item.classList.remove("selected");
+                });
+                button.classList.add("selected");
+                feedback.textContent = "Option " + ["A", "B", "C", "D"][index] + " selected.";
+                nextButton.hidden = false;
+            });
+            optionsBox.appendChild(button);
         });
 
-        quizOptions.appendChild(button);
-    });
-}
-
-function answerQuizQuestion(selectedIndex) {
-    if (quizAnswered) return;
-
-    quizAnswered = true;
-
-    const question = quizQuestions[quizIndex];
-    const buttons = quizOptions.querySelectorAll("button");
-
-    buttons.forEach(function (button, index) {
-        button.disabled = true;
-
-        if (index === question.answer) {
-            button.classList.add("correct");
-        }
-    });
-
-    if (selectedIndex === question.answer) {
-        quizScore++;
-
-        quizFeedback.textContent = "Correct! Great job. 🎉";
-        quizFeedback.style.color = "#4ade80";
-    } else {
-        buttons[selectedIndex].classList.add("incorrect");
-
-        quizFeedback.textContent =
-            "Not quite! The correct answer is: " +
-            question.options[question.answer];
-
-        quizFeedback.style.color = "#fb7185";
+        nextButton.textContent = "LOCK ANSWER";
+        nextButton.hidden = true;
+        renderLadder();
     }
 
-    nextQuestion.hidden = false;
+    async function generateQuestion() {
+        if (loading) return;
+        loading = true;
+        startButton.disabled = true;
+        nextButton.disabled = true;
+        showLoading("GRADE BOT is setting your question...");
+        feedback.textContent = "";
 
-    nextQuestion.textContent =
-        quizIndex === quizQuestions.length - 1
-            ? "View Results"
-            : "Next Question";
-}
+        try {
+            if (!currentUser) throw new Error("Please sign in before starting Millionaire Mode.");
 
-if (nextQuestion) {
-    nextQuestion.addEventListener("click", function () {
-        if (!quizAnswered) return;
+            const { data, error } = await db.functions.invoke("gx-arena", {
+                body: {
+                    action: "generate_question",
+                    subject_id: MATH_SUBJECT_ID,
+                    difficulty: questionNumber < 5 ? "easy" : questionNumber < 10 ? "normal" : "hard",
+                    education_level: "ND",
+                    exam_source: "general"
+                }
+            });
 
-        quizIndex++;
+            if (error) throw error;
+            if (!data || data.success === false) {
+                throw new Error((data && data.error) || "GRADE BOT could not generate a question.");
+            }
 
-        if (quizIndex < quizQuestions.length) {
-            showQuizQuestion();
-            return;
+            const question = data.question || data;
+            showQuestion(question);
+        } catch (error) {
+            console.error("Millionaire question error:", error);
+            optionsBox.innerHTML = "";
+            questionText.textContent = "We couldn't load this question.";
+            feedback.textContent = error.message || "Please check your connection and try again.";
+            const retry = document.createElement("button");
+            retry.type = "button";
+            retry.className = "gxm-confirm";
+            retry.textContent = "TRY AGAIN";
+            retry.addEventListener("click", generateQuestion);
+            optionsBox.appendChild(retry);
+        } finally {
+            loading = false;
+            startButton.disabled = false;
+            nextButton.disabled = false;
         }
+    }
 
-        quizProgress.textContent = "CHALLENGE COMPLETED";
-
-        quizQuestion.textContent =
-            "You scored " + quizScore +
-            " out of " + quizQuestions.length + "!";
-
-        quizOptions.innerHTML = "";
-
-        quizFeedback.textContent =
-            quizScore >= 8
-                ? "Excellent work! 🏆"
-                : quizScore >= 5
-                    ? "Good effort! Keep practising. 💪"
-                    : "Keep learning and try again! 📚";
-
-        quizFeedback.style.color = "#36e4f5";
-
-        nextQuestion.hidden = true;
-        startQuiz.hidden = false;
-        startQuiz.textContent = "Play Again";
+    startButton.addEventListener("click", function () {
+        questionNumber = 0;
+        intro.hidden = true;
+        quizArea.hidden = false;
+        renderLadder();
+        generateQuestion();
     });
-}
 
+    nextButton.addEventListener("click", function () {
+        if (selectedOption === null || loading) return;
+
+        // The correct answer must remain server-side. The secure submit_answer
+        // action is being added before answer locking/scoring is enabled.
+        feedback.textContent = "Your choice is selected. Secure answer marking is the next connection.";
+        nextButton.hidden = true;
+        optionsBox.querySelectorAll(".gxm-option").forEach(function (button) {
+            button.disabled = true;
+        });
+    });
+
+    if (exitButton) {
+        exitButton.addEventListener("click", function () {
+            quizArea.hidden = true;
+            intro.hidden = false;
+            questionNumber = 0;
+            selectedOption = null;
+            currentQuestionId = null;
+            questionText.textContent = "Your question will appear here.";
+            optionsBox.innerHTML = "";
+            feedback.textContent = "";
+            renderLadder();
+        });
+    }
+
+    renderLadder();
+})();
 
 // ============================================
 // 15. EDIT STUDENT PROFILE
